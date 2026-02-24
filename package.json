@@ -17,6 +17,11 @@
       "import": "./packages/auth/dist/index.mjs",
       "require": "./packages/auth/dist/index.js",
       "types": "./packages/auth/dist/index.d.ts"
+    },
+    "./auth/server": {
+      "import": "./packages/auth/dist/server.mjs",
+      "require": "./packages/auth/dist/server.js",
+      "types": "./packages/auth/dist/server.d.ts"
     }
   },
   "scripts": {
