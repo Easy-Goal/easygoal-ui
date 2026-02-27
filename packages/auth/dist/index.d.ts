@@ -1,9 +1,57 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
 import { ReactNode } from 'react';
-import { SupabaseClient } from '@supabase/supabase-js';
-import { A as AuthProviderConfig, a as AuthContextValue } from './server-WNGamoLv.js';
-export { b as AuthCompany, c as AuthData, d as AuthStats, e as AuthUser, C as CallbackConfig, M as MiddlewareConfig, f as createCallbackRoute, g as defaultMatcherConfig, h as handleAuthCallback, u as updateSession } from './server-WNGamoLv.js';
-import 'next/server';
+import { Session, SupabaseClient } from '@supabase/supabase-js';
+
+interface AuthProviderConfig {
+    /** SSO login URL (e.g. https://sso.easygoal.com.br) */
+    loginUrl: string;
+    /** This app's public URL */
+    appUrl: string;
+    /** Path for auth callback (default: /auth/callback) */
+    callbackPath?: string;
+    /** Default redirect after login (default: /dashboard) */
+    defaultRedirect?: string;
+    /** Custom loading component */
+    loadingComponent?: ReactNode;
+    /** Future: API key for third-party app authentication */
+    apiKey?: string;
+    /** Future: Requested scopes */
+    scopes?: string[];
+}
+interface AuthContextValue {
+    session: Session | null;
+    isReady: boolean;
+    signOut: () => Promise<void>;
+}
+interface AuthUser {
+    id: string;
+    name: string;
+    email: string;
+    avatar_url: string | null;
+    role_id: string | null;
+    role_name: string | null;
+    permissions: string[];
+    is_super_admin: boolean;
+    is_producer: boolean;
+    producer_id: string | null;
+    provider: string | null;
+    phone_number: string | null;
+}
+interface AuthCompany {
+    id: string;
+    name: string;
+    cnpj: string | null;
+    plan: string | null;
+}
+interface AuthStats {
+    saas_products_count: number;
+    active_services_count: number;
+}
+interface AuthData {
+    user: AuthUser;
+    company: AuthCompany | null;
+    stats: AuthStats | null;
+}
 
 declare function useAuthSession(): AuthContextValue;
 interface AuthProviderProps {
@@ -13,4 +61,4 @@ interface AuthProviderProps {
 }
 declare function AuthProvider({ children, config, supabaseClient }: AuthProviderProps): react_jsx_runtime.JSX.Element;
 
-export { AuthContextValue, AuthProvider, AuthProviderConfig, useAuthSession };
+export { type AuthCompany, type AuthContextValue, type AuthData, AuthProvider, type AuthProviderConfig, type AuthStats, type AuthUser, useAuthSession };

@@ -1,10 +1,3 @@
-import {
-  createCallbackRoute,
-  defaultMatcherConfig,
-  handleAuthCallback,
-  updateSession
-} from "./chunk-XEKJRYPI.mjs";
-
 // src/providers/AuthProvider.tsx
 import {
   createContext,
@@ -77,10 +70,6 @@ function AuthProvider({ children, config, supabaseClient }) {
 }
 export {
   AuthProvider,
-  createCallbackRoute,
-  defaultMatcherConfig,
-  handleAuthCallback,
-  updateSession,
   useAuthSession
 };
 //# sourceMappingURL=index.mjs.map

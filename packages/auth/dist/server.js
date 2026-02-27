@@ -138,11 +138,4 @@ var defaultMatcherConfig = {
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
   ]
 };
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  createCallbackRoute,
-  defaultMatcherConfig,
-  handleAuthCallback,
-  updateSession
-});
 //# sourceMappingURL=server.js.map
