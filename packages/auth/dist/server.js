@@ -87,6 +87,10 @@ async function handleAuthCallback(request, config) {
     });
     return redirectResponse;
   }
+  const silentCheck = searchParams.get("silent_check");
+  if (silentCheck === "no_session") {
+    return import_server.NextResponse.redirect(new URL(next, origin));
+  }
   const loginUrl = config.ssoUrl || origin;
   const appUrl = config.appUrl || origin;
   const redirectTo = `${appUrl}/auth/callback?next=${encodeURIComponent(next)}`;

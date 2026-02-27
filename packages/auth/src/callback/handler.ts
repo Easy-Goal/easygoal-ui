@@ -73,6 +73,12 @@ export async function handleAuthCallback(
     return redirectResponse;
   }
 
+  // Silent check sem sessão: não forçar login, apenas redirecionar para `next`
+  const silentCheck = searchParams.get('silent_check');
+  if (silentCheck === 'no_session') {
+    return NextResponse.redirect(new URL(next, origin));
+  }
+
   // Fallback: redirect to SSO login
   const loginUrl = config.ssoUrl || origin;
   const appUrl = config.appUrl || origin;
