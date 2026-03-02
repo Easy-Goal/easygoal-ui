@@ -81,7 +81,12 @@ function useSSOLogin(config) {
     checkUrl.searchParams.set("next", next);
     window.location.href = checkUrl.toString();
   }, [ssoUrl, apiKey, callbackPath, next]);
-  return { login };
+  const logout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = `${ssoUrl}/auth/signout`;
+  };
+  return { login, logout };
 }
 export {
   AuthProvider,
