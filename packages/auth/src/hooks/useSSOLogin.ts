@@ -34,24 +34,11 @@ export function useSSOLogin(config: SSOLoginConfig) {
     window.location.href = checkUrl.toString();
   }, [ssoUrl, apiKey, callbackPath, next]);
 
-  const logout = async () => {
-    try {
-      localStorage.clear();
-      sessionStorage.clear();
+  const logout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
 
-      document.cookie.split(";").forEach((cookie) => {
-        const name = cookie.split("=")[0].trim();
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      });
-
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = `${ssoUrl}/auth/signout`;
-      document.body.appendChild(form);
-      form.submit();
-    } catch (error) {
-      console.error("Erro no logout:", error);
-    }
+    window.location.href = `${ssoUrl}/auth/signout`;
   };
 
   return { login, logout };
