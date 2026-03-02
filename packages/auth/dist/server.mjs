@@ -121,11 +121,32 @@ function createCallbackRoute(config) {
   };
 }
 
+// src/signout/handler.ts
+import { cookies } from "next/headers";
+import { NextResponse as NextResponse2 } from "next/server";
+var EG_SESSION_COOKIE2 = "eg_session";
+async function handleSignout() {
+  const cookieStore = await cookies();
+  cookieStore.set(EG_SESSION_COOKIE2, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0
+  });
+  return NextResponse2.json({ success: true });
+}
+function createSignoutRoute() {
+  return async function POST() {
+    return handleSignout();
+  };
+}
+
 // src/middleware/updateSession.ts
 import { createServerClient as createServerClient2 } from "@supabase/ssr";
-import { NextResponse as NextResponse2 } from "next/server";
+import { NextResponse as NextResponse3 } from "next/server";
 async function updateSession(request, config) {
-  let supabaseResponse = NextResponse2.next({ request });
+  let supabaseResponse = NextResponse3.next({ request });
   const supabase = createServerClient2(
     config.supabaseUrl,
     config.supabaseAnonKey,
@@ -138,7 +159,7 @@ async function updateSession(request, config) {
           cookiesToSet.forEach(
             ({ name, value }) => request.cookies.set(name, value)
           );
-          supabaseResponse = NextResponse2.next({ request });
+          supabaseResponse = NextResponse3.next({ request });
           cookiesToSet.forEach(
             ({ name, value, options }) => (
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -159,8 +180,10 @@ var defaultMatcherConfig = {
 };
 export {
   createCallbackRoute,
+  createSignoutRoute,
   defaultMatcherConfig,
   handleAuthCallback,
+  handleSignout,
   updateSession
 };
 //# sourceMappingURL=server.mjs.map

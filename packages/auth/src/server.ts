@@ -6,6 +6,9 @@
 export { handleAuthCallback } from './callback/handler';
 export { createCallbackRoute } from './callback/route';
 
+// Signout
+export { createSignoutRoute, handleSignout } from './signout/handler';
+
 // Middleware
 export { defaultMatcherConfig, updateSession } from './middleware/updateSession';
 

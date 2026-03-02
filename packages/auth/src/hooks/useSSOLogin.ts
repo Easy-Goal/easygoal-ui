@@ -11,6 +11,12 @@ export interface SSOLoginConfig {
   callbackPath?: string;
   /** Rota para redirecionar após login (default: '/') */
   next?: string;
+  /**
+   * Rota local de signout para limpar o cookie httpOnly `eg_session`.
+   * Deve apontar para um endpoint POST da própria app.
+   * (default: '/api/auth/signout')
+   */
+  logoutPath?: string;
 }
 
 /**
@@ -23,7 +29,13 @@ export interface SSOLoginConfig {
  * ```
  */
 export function useSSOLogin(config: SSOLoginConfig) {
-  const { ssoUrl, apiKey, callbackPath = '/auth/callback', next = '/' } = config;
+  const {
+    ssoUrl,
+    apiKey,
+    callbackPath = '/auth/callback',
+    next = '/',
+    logoutPath = '/api/auth/signout',
+  } = config;
 
   const login = useCallback(() => {
     const callbackUrl = `${window.location.origin}${callbackPath}`;
@@ -34,23 +46,23 @@ export function useSSOLogin(config: SSOLoginConfig) {
     window.location.href = checkUrl.toString();
   }, [ssoUrl, apiKey, callbackPath, next]);
 
-  const logout = () => {
+  const logout = useCallback(async () => {
+    // Limpar storage local
     localStorage.clear();
     sessionStorage.clear();
 
-    document.cookie.split(";").forEach((cookie) => {
-      const name = cookie.split("=")[0].trim();
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    });
+    // Limpar o cookie httpOnly eg_session via rota server-side da própria app
+    // (document.cookie não consegue deletar cookies httpOnly)
+    await fetch(logoutPath, { method: 'POST' }).catch(() => {});
 
-    // 🔥 chama SSO em background
+    // Invalidar a sessão Supabase no SSO (fire-and-forget)
     fetch(`${ssoUrl}/auth/signout`, {
-      method: "POST",
-      credentials: "include",
-    }).catch(() => { });
+      method: 'POST',
+      credentials: 'include',
+    }).catch(() => {});
 
-    window.location.href = "/";
-  };
+    window.location.href = '/';
+  }, [ssoUrl, logoutPath]);
 
   return { login, logout };
 }

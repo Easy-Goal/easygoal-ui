@@ -61,6 +61,50 @@ interface AuthProviderProps {
 }
 declare function AuthProvider({ children, config, supabaseClient }: AuthProviderProps): react_jsx_runtime.JSX.Element;
 
+interface EgSessionUser {
+    id: string;
+    email: string | undefined;
+    name: string | null;
+    avatarUrl: string | null;
+    isProducer: boolean;
+    companyName: string | null;
+    rankName: string | null;
+    planSlug: string | null;
+}
+interface EgSessionContextValue {
+    user: EgSessionUser | null;
+    isReady: boolean;
+}
+interface EgSessionConfig {
+    /** Path do endpoint que retorna os claims da sessão (default: '/api/auth/session') */
+    sessionPath?: string;
+}
+declare function useEgSession(): EgSessionContextValue;
+interface EgSessionProviderProps {
+    children: ReactNode;
+    config?: EgSessionConfig;
+}
+/**
+ * Provider para apps que usam o fluxo SSO sem credenciais Supabase direta.
+ * Lê a sessão via `eg_session` cookie através do endpoint `/api/auth/session`.
+ *
+ * Uso:
+ * ```tsx
+ * // layout.tsx
+ * import { EgSessionProvider } from '@easygoal/packages/auth/client';
+ *
+ * export default function RootLayout({ children }) {
+ *   return <EgSessionProvider>{children}</EgSessionProvider>;
+ * }
+ * ```
+ *
+ * Em qualquer componente filho:
+ * ```tsx
+ * const { user, isReady } = useEgSession();
+ * ```
+ */
+declare function EgSessionProvider({ children, config }: EgSessionProviderProps): react_jsx_runtime.JSX.Element;
+
 interface SSOLoginConfig {
     /** URL base do SSO (ex: https://sso.easygoal.com.br) */
     ssoUrl: string;
@@ -70,6 +114,12 @@ interface SSOLoginConfig {
     callbackPath?: string;
     /** Rota para redirecionar após login (default: '/') */
     next?: string;
+    /**
+     * Rota local de signout para limpar o cookie httpOnly `eg_session`.
+     * Deve apontar para um endpoint POST da própria app.
+     * (default: '/api/auth/signout')
+     */
+    logoutPath?: string;
 }
 /**
  * Hook para iniciar o fluxo de login via SSO Easy Goal manualmente.
@@ -82,7 +132,7 @@ interface SSOLoginConfig {
  */
 declare function useSSOLogin(config: SSOLoginConfig): {
     login: () => void;
-    logout: () => void;
+    logout: () => Promise<void>;
 };
 
-export { type AuthCompany, type AuthContextValue, type AuthData, AuthProvider, type AuthProviderConfig, type AuthStats, type AuthUser, type SSOLoginConfig, useAuthSession, useSSOLogin };
+export { type AuthCompany, type AuthContextValue, type AuthData, AuthProvider, type AuthProviderConfig, type AuthStats, type AuthUser, type EgSessionConfig, type EgSessionContextValue, EgSessionProvider, type EgSessionUser, type SSOLoginConfig, useAuthSession, useEgSession, useSSOLogin };

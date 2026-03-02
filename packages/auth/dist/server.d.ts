@@ -47,9 +47,25 @@ declare function handleAuthCallback(request: NextRequest, config: CallbackConfig
 
 declare function createCallbackRoute(config: CallbackConfig): (request: NextRequest) => Promise<next_server.NextResponse<unknown>>;
 
+/**
+ * Limpa o cookie httpOnly `eg_session` server-side.
+ * Deve ser chamado em um route handler POST da app que usa SSO.
+ */
+declare function handleSignout(): Promise<NextResponse>;
+/**
+ * Factory que cria um route handler POST para signout.
+ *
+ * Uso em `app/api/auth/signout/route.ts`:
+ * ```ts
+ * import { createSignoutRoute } from '@easygoal/packages/auth/server';
+ * export const POST = createSignoutRoute();
+ * ```
+ */
+declare function createSignoutRoute(): () => Promise<NextResponse>;
+
 declare function updateSession(request: NextRequest, config: MiddlewareConfig): Promise<NextResponse<unknown>>;
 declare const defaultMatcherConfig: {
     matcher: string[];
 };
 
-export { type AuthCompany, type AuthData, type AuthStats, type AuthUser, type CallbackConfig, type MiddlewareConfig, createCallbackRoute, defaultMatcherConfig, handleAuthCallback, updateSession };
+export { type AuthCompany, type AuthData, type AuthStats, type AuthUser, type CallbackConfig, type MiddlewareConfig, createCallbackRoute, createSignoutRoute, defaultMatcherConfig, handleAuthCallback, handleSignout, updateSession };

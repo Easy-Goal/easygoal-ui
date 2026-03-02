@@ -21,8 +21,10 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var server_exports = {};
 __export(server_exports, {
   createCallbackRoute: () => createCallbackRoute,
+  createSignoutRoute: () => createSignoutRoute,
   defaultMatcherConfig: () => defaultMatcherConfig,
   handleAuthCallback: () => handleAuthCallback,
+  handleSignout: () => handleSignout,
   updateSession: () => updateSession
 });
 module.exports = __toCommonJS(server_exports);
@@ -150,11 +152,32 @@ function createCallbackRoute(config) {
   };
 }
 
+// src/signout/handler.ts
+var import_headers = require("next/headers");
+var import_server2 = require("next/server");
+var EG_SESSION_COOKIE2 = "eg_session";
+async function handleSignout() {
+  const cookieStore = await (0, import_headers.cookies)();
+  cookieStore.set(EG_SESSION_COOKIE2, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0
+  });
+  return import_server2.NextResponse.json({ success: true });
+}
+function createSignoutRoute() {
+  return async function POST() {
+    return handleSignout();
+  };
+}
+
 // src/middleware/updateSession.ts
 var import_ssr2 = require("@supabase/ssr");
-var import_server2 = require("next/server");
+var import_server3 = require("next/server");
 async function updateSession(request, config) {
-  let supabaseResponse = import_server2.NextResponse.next({ request });
+  let supabaseResponse = import_server3.NextResponse.next({ request });
   const supabase = (0, import_ssr2.createServerClient)(
     config.supabaseUrl,
     config.supabaseAnonKey,
@@ -167,7 +190,7 @@ async function updateSession(request, config) {
           cookiesToSet.forEach(
             ({ name, value }) => request.cookies.set(name, value)
           );
-          supabaseResponse = import_server2.NextResponse.next({ request });
+          supabaseResponse = import_server3.NextResponse.next({ request });
           cookiesToSet.forEach(
             ({ name, value, options }) => (
               // eslint-disable-next-line @typescript-eslint/no-explicit-any

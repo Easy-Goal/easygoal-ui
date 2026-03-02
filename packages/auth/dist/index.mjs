@@ -69,10 +69,62 @@ function AuthProvider({ children, config, supabaseClient }) {
   return /* @__PURE__ */ jsx(AuthContext.Provider, { value: { session, isReady, signOut }, children });
 }
 
+// src/providers/EgSessionProvider.tsx
+import {
+  createContext as createContext2,
+  useContext as useContext2,
+  useEffect as useEffect2,
+  useState as useState2
+} from "react";
+import { jsx as jsx2 } from "react/jsx-runtime";
+var EgSessionContext = createContext2({
+  user: null,
+  isReady: false
+});
+function useEgSession() {
+  return useContext2(EgSessionContext);
+}
+function EgSessionProvider({ children, config }) {
+  const { sessionPath = "/api/auth/session" } = config ?? {};
+  const [state, setState] = useState2({
+    user: null,
+    isReady: false
+  });
+  useEffect2(() => {
+    fetch(sessionPath).then((res) => res.json()).then((data) => {
+      setState({
+        user: data ? mapClaims(data) : null,
+        isReady: true
+      });
+    }).catch(() => {
+      setState({ user: null, isReady: true });
+    });
+  }, [sessionPath]);
+  return /* @__PURE__ */ jsx2(EgSessionContext.Provider, { value: state, children });
+}
+function mapClaims(claims) {
+  return {
+    id: String(claims.sub ?? ""),
+    email: claims.email,
+    name: claims.name ?? null,
+    avatarUrl: claims.avatar_url ?? null,
+    isProducer: claims.is_producer === true,
+    companyName: claims.company_name ?? null,
+    rankName: claims.rank_name ?? null,
+    planSlug: claims.plan_slug ?? null
+  };
+}
+
 // src/hooks/useSSOLogin.ts
 import { useCallback as useCallback2 } from "react";
 function useSSOLogin(config) {
-  const { ssoUrl, apiKey, callbackPath = "/auth/callback", next = "/" } = config;
+  const {
+    ssoUrl,
+    apiKey,
+    callbackPath = "/auth/callback",
+    next = "/",
+    logoutPath = "/api/auth/signout"
+  } = config;
   const login = useCallback2(() => {
     const callbackUrl = `${window.location.origin}${callbackPath}`;
     const checkUrl = new URL(`${ssoUrl}/auth/check`);
@@ -81,12 +133,10 @@ function useSSOLogin(config) {
     checkUrl.searchParams.set("next", next);
     window.location.href = checkUrl.toString();
   }, [ssoUrl, apiKey, callbackPath, next]);
-  const logout = () => {
+  const logout = useCallback2(async () => {
     localStorage.clear();
     sessionStorage.clear();
-    document.cookie.split(";").forEach((cookie) => {
-      const name = cookie.split("=")[0].trim();
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    await fetch(logoutPath, { method: "POST" }).catch(() => {
     });
     fetch(`${ssoUrl}/auth/signout`, {
       method: "POST",
@@ -94,12 +144,14 @@ function useSSOLogin(config) {
     }).catch(() => {
     });
     window.location.href = "/";
-  };
+  }, [ssoUrl, logoutPath]);
   return { login, logout };
 }
 export {
   AuthProvider,
+  EgSessionProvider,
   useAuthSession,
+  useEgSession,
   useSSOLogin
 };
 //# sourceMappingURL=index.mjs.map

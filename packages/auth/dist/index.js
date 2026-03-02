@@ -21,7 +21,9 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var src_exports = {};
 __export(src_exports, {
   AuthProvider: () => AuthProvider,
+  EgSessionProvider: () => EgSessionProvider,
   useAuthSession: () => useAuthSession,
+  useEgSession: () => useEgSession,
   useSSOLogin: () => useSSOLogin
 });
 module.exports = __toCommonJS(src_exports);
@@ -91,11 +93,58 @@ function AuthProvider({ children, config, supabaseClient }) {
   return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AuthContext.Provider, { value: { session, isReady, signOut }, children });
 }
 
-// src/hooks/useSSOLogin.ts
+// src/providers/EgSessionProvider.tsx
 var import_react2 = require("react");
+var import_jsx_runtime2 = require("react/jsx-runtime");
+var EgSessionContext = (0, import_react2.createContext)({
+  user: null,
+  isReady: false
+});
+function useEgSession() {
+  return (0, import_react2.useContext)(EgSessionContext);
+}
+function EgSessionProvider({ children, config }) {
+  const { sessionPath = "/api/auth/session" } = config ?? {};
+  const [state, setState] = (0, import_react2.useState)({
+    user: null,
+    isReady: false
+  });
+  (0, import_react2.useEffect)(() => {
+    fetch(sessionPath).then((res) => res.json()).then((data) => {
+      setState({
+        user: data ? mapClaims(data) : null,
+        isReady: true
+      });
+    }).catch(() => {
+      setState({ user: null, isReady: true });
+    });
+  }, [sessionPath]);
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(EgSessionContext.Provider, { value: state, children });
+}
+function mapClaims(claims) {
+  return {
+    id: String(claims.sub ?? ""),
+    email: claims.email,
+    name: claims.name ?? null,
+    avatarUrl: claims.avatar_url ?? null,
+    isProducer: claims.is_producer === true,
+    companyName: claims.company_name ?? null,
+    rankName: claims.rank_name ?? null,
+    planSlug: claims.plan_slug ?? null
+  };
+}
+
+// src/hooks/useSSOLogin.ts
+var import_react3 = require("react");
 function useSSOLogin(config) {
-  const { ssoUrl, apiKey, callbackPath = "/auth/callback", next = "/" } = config;
-  const login = (0, import_react2.useCallback)(() => {
+  const {
+    ssoUrl,
+    apiKey,
+    callbackPath = "/auth/callback",
+    next = "/",
+    logoutPath = "/api/auth/signout"
+  } = config;
+  const login = (0, import_react3.useCallback)(() => {
     const callbackUrl = `${window.location.origin}${callbackPath}`;
     const checkUrl = new URL(`${ssoUrl}/auth/check`);
     checkUrl.searchParams.set("api_key", apiKey);
@@ -103,12 +152,10 @@ function useSSOLogin(config) {
     checkUrl.searchParams.set("next", next);
     window.location.href = checkUrl.toString();
   }, [ssoUrl, apiKey, callbackPath, next]);
-  const logout = () => {
+  const logout = (0, import_react3.useCallback)(async () => {
     localStorage.clear();
     sessionStorage.clear();
-    document.cookie.split(";").forEach((cookie) => {
-      const name = cookie.split("=")[0].trim();
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    await fetch(logoutPath, { method: "POST" }).catch(() => {
     });
     fetch(`${ssoUrl}/auth/signout`, {
       method: "POST",
@@ -116,13 +163,15 @@ function useSSOLogin(config) {
     }).catch(() => {
     });
     window.location.href = "/";
-  };
+  }, [ssoUrl, logoutPath]);
   return { login, logout };
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AuthProvider,
+  EgSessionProvider,
   useAuthSession,
+  useEgSession,
   useSSOLogin
 });
 //# sourceMappingURL=index.js.map
