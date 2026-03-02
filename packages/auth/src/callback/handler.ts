@@ -2,6 +2,9 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import type { CallbackConfig } from '../types';
 
+const EG_SESSION_COOKIE = 'eg_session';
+const EG_SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 dias
+
 export async function handleAuthCallback(
   request: NextRequest,
   config: CallbackConfig
@@ -10,7 +13,66 @@ export async function handleAuthCallback(
   const code = searchParams.get('code');
   const accessToken = searchParams.get('access_token');
   const refreshToken = searchParams.get('refresh_token');
+  const egToken = searchParams.get('eg_token');
   const next = searchParams.get('next') ?? '/dashboard';
+
+  // Method 0: EasyGoal JWT (eg_token) — modo sem Supabase
+  if (egToken && config.apiKey && config.ssoUrl) {
+    try {
+      const verifyRes = await fetch(`${config.ssoUrl}/auth/verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${config.apiKey}`,
+        },
+        body: JSON.stringify({ token: egToken }),
+      });
+
+      if (verifyRes.ok) {
+        const { user } = await verifyRes.json();
+        const redirectResponse = NextResponse.redirect(new URL(next, origin));
+
+        redirectResponse.cookies.set(EG_SESSION_COOKIE, JSON.stringify(user), {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          path: '/',
+          maxAge: EG_SESSION_MAX_AGE,
+        });
+
+        return redirectResponse;
+      }
+
+      console.error('[auth] eg_token verify failed:', await verifyRes.text());
+    } catch (err) {
+      console.error('[auth] eg_token verify error:', err);
+    }
+
+    // Falha na verificação — redireciona para login
+    const loginUrl = config.ssoUrl || origin;
+    const appUrl = config.appUrl || origin;
+    const redirectTo = `${appUrl}/auth/callback?next=${encodeURIComponent(next)}`;
+    return NextResponse.redirect(
+      `${loginUrl}/auth/login?redirect_to=${encodeURIComponent(redirectTo)}`
+    );
+  }
+
+  // Silent check sem sessão: não forçar login
+  const silentCheck = searchParams.get('silent_check');
+  if (silentCheck === 'no_session') {
+    return NextResponse.redirect(new URL(next, origin));
+  }
+
+  // Métodos legados com Supabase (apenas quando supabaseUrl e supabaseAnonKey estão configurados)
+  if (!config.supabaseUrl || !config.supabaseAnonKey) {
+    // Sem Supabase e sem eg_token válido: redirecionar para login
+    const loginUrl = config.ssoUrl || origin;
+    const appUrl = config.appUrl || origin;
+    const redirectTo = `${appUrl}/auth/callback?next=${encodeURIComponent(next)}`;
+    return NextResponse.redirect(
+      `${loginUrl}/auth/login?redirect_to=${encodeURIComponent(redirectTo)}`
+    );
+  }
 
   let response = NextResponse.next({ request });
 
@@ -71,12 +133,6 @@ export async function handleAuthCallback(
     });
 
     return redirectResponse;
-  }
-
-  // Silent check sem sessão: não forçar login, apenas redirecionar para `next`
-  const silentCheck = searchParams.get('silent_check');
-  if (silentCheck === 'no_session') {
-    return NextResponse.redirect(new URL(next, origin));
   }
 
   // Fallback: redirect to SSO login

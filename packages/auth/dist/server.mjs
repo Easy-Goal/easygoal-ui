@@ -1,12 +1,60 @@
 // src/callback/handler.ts
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
+var EG_SESSION_COOKIE = "eg_session";
+var EG_SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 async function handleAuthCallback(request, config) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const accessToken = searchParams.get("access_token");
   const refreshToken = searchParams.get("refresh_token");
+  const egToken = searchParams.get("eg_token");
   const next = searchParams.get("next") ?? "/dashboard";
+  if (egToken && config.apiKey && config.ssoUrl) {
+    try {
+      const verifyRes = await fetch(`${config.ssoUrl}/auth/verify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${config.apiKey}`
+        },
+        body: JSON.stringify({ token: egToken })
+      });
+      if (verifyRes.ok) {
+        const { user } = await verifyRes.json();
+        const redirectResponse = NextResponse.redirect(new URL(next, origin));
+        redirectResponse.cookies.set(EG_SESSION_COOKIE, JSON.stringify(user), {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          path: "/",
+          maxAge: EG_SESSION_MAX_AGE
+        });
+        return redirectResponse;
+      }
+      console.error("[auth] eg_token verify failed:", await verifyRes.text());
+    } catch (err) {
+      console.error("[auth] eg_token verify error:", err);
+    }
+    const loginUrl2 = config.ssoUrl || origin;
+    const appUrl2 = config.appUrl || origin;
+    const redirectTo2 = `${appUrl2}/auth/callback?next=${encodeURIComponent(next)}`;
+    return NextResponse.redirect(
+      `${loginUrl2}/auth/login?redirect_to=${encodeURIComponent(redirectTo2)}`
+    );
+  }
+  const silentCheck = searchParams.get("silent_check");
+  if (silentCheck === "no_session") {
+    return NextResponse.redirect(new URL(next, origin));
+  }
+  if (!config.supabaseUrl || !config.supabaseAnonKey) {
+    const loginUrl2 = config.ssoUrl || origin;
+    const appUrl2 = config.appUrl || origin;
+    const redirectTo2 = `${appUrl2}/auth/callback?next=${encodeURIComponent(next)}`;
+    return NextResponse.redirect(
+      `${loginUrl2}/auth/login?redirect_to=${encodeURIComponent(redirectTo2)}`
+    );
+  }
   let response = NextResponse.next({ request });
   const supabase = createServerClient(
     config.supabaseUrl,
@@ -57,10 +105,6 @@ async function handleAuthCallback(request, config) {
       redirectResponse.cookies.set(cookie.name, cookie.value);
     });
     return redirectResponse;
-  }
-  const silentCheck = searchParams.get("silent_check");
-  if (silentCheck === "no_session") {
-    return NextResponse.redirect(new URL(next, origin));
   }
   const loginUrl = config.ssoUrl || origin;
   const appUrl = config.appUrl || origin;

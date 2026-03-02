@@ -60,10 +60,12 @@ export interface AuthData {
 }
 
 export interface CallbackConfig {
-  supabaseUrl: string;
-  supabaseAnonKey: string;
+  supabaseUrl?: string;
+  supabaseAnonKey?: string;
   ssoUrl?: string;
   appUrl?: string;
+  /** Server-side API key para verificar eg_token via SSO /auth/verify */
+  apiKey?: string;
 }
 
 export interface MiddlewareConfig {

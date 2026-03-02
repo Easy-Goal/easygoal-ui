@@ -31,10 +31,12 @@ interface AuthData {
     stats: AuthStats | null;
 }
 interface CallbackConfig {
-    supabaseUrl: string;
-    supabaseAnonKey: string;
+    supabaseUrl?: string;
+    supabaseAnonKey?: string;
     ssoUrl?: string;
     appUrl?: string;
+    /** Server-side API key para verificar eg_token via SSO /auth/verify */
+    apiKey?: string;
 }
 interface MiddlewareConfig {
     supabaseUrl: string;
