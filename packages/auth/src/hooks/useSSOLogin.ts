@@ -17,6 +17,11 @@ export interface SSOLoginConfig {
    * (default: '/api/auth/signout')
    */
   logoutPath?: string;
+  /**
+   * URL ou path para redirecionar após logout (default: '/').
+   * Útil para enviar o usuário ao root da app após sair.
+   */
+  redirectAfterLogout?: string;
 }
 
 /**
@@ -35,6 +40,7 @@ export function useSSOLogin(config: SSOLoginConfig) {
     callbackPath = '/auth/callback',
     next = '/',
     logoutPath = '/api/auth/signout',
+    redirectAfterLogout = '/',
   } = config;
 
   const login = useCallback(() => {
@@ -61,8 +67,8 @@ export function useSSOLogin(config: SSOLoginConfig) {
       credentials: 'include',
     }).catch(() => {});
 
-    window.location.href = '/';
-  }, [ssoUrl, logoutPath]);
+    window.location.href = redirectAfterLogout;
+  }, [ssoUrl, logoutPath, redirectAfterLogout]);
 
   return { login, logout };
 }

@@ -142,7 +142,8 @@ function useSSOLogin(config) {
     apiKey,
     callbackPath = "/auth/callback",
     next = "/",
-    logoutPath = "/api/auth/signout"
+    logoutPath = "/api/auth/signout",
+    redirectAfterLogout = "/"
   } = config;
   const login = (0, import_react3.useCallback)(() => {
     const callbackUrl = `${window.location.origin}${callbackPath}`;
@@ -162,8 +163,8 @@ function useSSOLogin(config) {
       credentials: "include"
     }).catch(() => {
     });
-    window.location.href = "/";
-  }, [ssoUrl, logoutPath]);
+    window.location.href = redirectAfterLogout;
+  }, [ssoUrl, logoutPath, redirectAfterLogout]);
   return { login, logout };
 }
 // Annotate the CommonJS export names for ESM import in node:

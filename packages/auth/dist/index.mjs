@@ -123,7 +123,8 @@ function useSSOLogin(config) {
     apiKey,
     callbackPath = "/auth/callback",
     next = "/",
-    logoutPath = "/api/auth/signout"
+    logoutPath = "/api/auth/signout",
+    redirectAfterLogout = "/"
   } = config;
   const login = useCallback2(() => {
     const callbackUrl = `${window.location.origin}${callbackPath}`;
@@ -143,8 +144,8 @@ function useSSOLogin(config) {
       credentials: "include"
     }).catch(() => {
     });
-    window.location.href = "/";
-  }, [ssoUrl, logoutPath]);
+    window.location.href = redirectAfterLogout;
+  }, [ssoUrl, logoutPath, redirectAfterLogout]);
   return { login, logout };
 }
 export {

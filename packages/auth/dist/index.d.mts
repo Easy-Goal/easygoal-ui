@@ -120,6 +120,11 @@ interface SSOLoginConfig {
      * (default: '/api/auth/signout')
      */
     logoutPath?: string;
+    /**
+     * URL ou path para redirecionar após logout (default: '/').
+     * Útil para enviar o usuário ao root da app após sair.
+     */
+    redirectAfterLogout?: string;
 }
 /**
  * Hook para iniciar o fluxo de login via SSO Easy Goal manualmente.
