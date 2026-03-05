@@ -25,8 +25,9 @@ export interface EgSessionContextValue {
 }
 
 export interface EgSessionConfig {
-  /** Path do endpoint que retorna os claims da sessão (default: '/api/auth/session') */
-  sessionPath?: string;
+  sessionPath?: string
+  ssoUrl?: string
+  apiKey?: string
 }
 
 const EgSessionContext = createContext<EgSessionContextValue>({
@@ -63,32 +64,54 @@ interface EgSessionProviderProps {
  * ```
  */
 export function EgSessionProvider({ children, config }: EgSessionProviderProps) {
-  const { sessionPath = '/api/auth/session' } = config ?? {};
+
+  const {
+    sessionPath = '/api/auth/session',
+    ssoUrl,
+    apiKey
+  } = config ?? {}
 
   const [state, setState] = useState<EgSessionContextValue>({
     user: null,
     isReady: false,
-  });
+  })
 
   useEffect(() => {
     fetch(sessionPath)
       .then((res) => res.json())
       .then((data) => {
+        if (!data && ssoUrl) {
+          const url = new URL(`${ssoUrl}/auth/login`)
+
+          if (apiKey) {
+            url.searchParams.set("api_key", apiKey)
+          }
+
+          url.searchParams.set(
+            "redirect_to",
+            window.location.href
+          )
+
+          window.location.href = url.toString()
+          return
+        }
+
         setState({
           user: data ? mapClaims(data) : null,
           isReady: true,
-        });
+        })
       })
       .catch(() => {
-        setState({ user: null, isReady: true });
-      });
-  }, [sessionPath]);
+        setState({ user: null, isReady: true })
+      })
+
+  }, [sessionPath, ssoUrl, apiKey])
 
   return (
     <EgSessionContext.Provider value={state}>
       {children}
     </EgSessionContext.Provider>
-  );
+  )
 }
 
 function mapClaims(claims: Record<string, unknown>): EgSessionUser {

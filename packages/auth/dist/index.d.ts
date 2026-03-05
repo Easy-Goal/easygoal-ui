@@ -76,8 +76,9 @@ interface EgSessionContextValue {
     isReady: boolean;
 }
 interface EgSessionConfig {
-    /** Path do endpoint que retorna os claims da sessão (default: '/api/auth/session') */
     sessionPath?: string;
+    ssoUrl?: string;
+    apiKey?: string;
 }
 declare function useEgSession(): EgSessionContextValue;
 interface EgSessionProviderProps {

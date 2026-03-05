@@ -85,13 +85,29 @@ function useEgSession() {
   return useContext2(EgSessionContext);
 }
 function EgSessionProvider({ children, config }) {
-  const { sessionPath = "/api/auth/session" } = config ?? {};
+  const {
+    sessionPath = "/api/auth/session",
+    ssoUrl,
+    apiKey
+  } = config ?? {};
   const [state, setState] = useState2({
     user: null,
     isReady: false
   });
   useEffect2(() => {
     fetch(sessionPath).then((res) => res.json()).then((data) => {
+      if (!data && ssoUrl) {
+        const url = new URL(`${ssoUrl}/auth/login`);
+        if (apiKey) {
+          url.searchParams.set("api_key", apiKey);
+        }
+        url.searchParams.set(
+          "redirect_to",
+          window.location.href
+        );
+        window.location.href = url.toString();
+        return;
+      }
       setState({
         user: data ? mapClaims(data) : null,
         isReady: true
@@ -99,7 +115,7 @@ function EgSessionProvider({ children, config }) {
     }).catch(() => {
       setState({ user: null, isReady: true });
     });
-  }, [sessionPath]);
+  }, [sessionPath, ssoUrl, apiKey]);
   return /* @__PURE__ */ jsx2(EgSessionContext.Provider, { value: state, children });
 }
 function mapClaims(claims) {
@@ -118,31 +134,26 @@ function mapClaims(claims) {
 // src/hooks/useSSOLogin.ts
 import { useCallback as useCallback2 } from "react";
 function useSSOLogin(config) {
-  const {
-    ssoUrl,
-    apiKey,
-    callbackPath = "/auth/callback",
-    next = "/",
-    logoutPath = "/api/auth/signout",
-    redirectAfterLogout = "/"
-  } = config;
   const login = useCallback2(() => {
-    const callbackUrl = `${window.location.origin}${callbackPath}`;
-    const checkUrl = new URL(`${ssoUrl}/auth/check`);
-    checkUrl.searchParams.set("api_key", apiKey);
-    checkUrl.searchParams.set("redirect_to", callbackUrl);
-    checkUrl.searchParams.set("next", next);
-    checkUrl.searchParams.set("prompt", "login");
-    window.location.href = checkUrl.toString();
-  }, [ssoUrl, apiKey, callbackPath, next]);
-  const logout = useCallback2(() => {
-    const returnUrl = `${window.location.origin}${logoutPath}?redirect=${encodeURIComponent(
-      redirectAfterLogout
-    )}`;
-    const url = new URL(`${ssoUrl}/auth/signout`);
-    url.searchParams.set("redirect_to", returnUrl);
+    const url = new URL(`${config.ssoUrl}/auth/login`);
+    if (config.apiKey) {
+      url.searchParams.set("api_key", config.apiKey);
+    }
+    url.searchParams.set(
+      "redirect_to",
+      window.location.href
+    );
     window.location.href = url.toString();
-  }, [ssoUrl, logoutPath, redirectAfterLogout]);
+  }, [config]);
+  const logout = useCallback2(() => {
+    localStorage.clear();
+    const url = new URL(`${config.ssoUrl}/auth/signout`);
+    url.searchParams.set(
+      "redirect_to",
+      window.location.origin
+    );
+    window.location.href = url.toString();
+  }, [config]);
   return { login, logout };
 }
 export {

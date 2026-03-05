@@ -104,13 +104,29 @@ function useEgSession() {
   return (0, import_react2.useContext)(EgSessionContext);
 }
 function EgSessionProvider({ children, config }) {
-  const { sessionPath = "/api/auth/session" } = config ?? {};
+  const {
+    sessionPath = "/api/auth/session",
+    ssoUrl,
+    apiKey
+  } = config ?? {};
   const [state, setState] = (0, import_react2.useState)({
     user: null,
     isReady: false
   });
   (0, import_react2.useEffect)(() => {
     fetch(sessionPath).then((res) => res.json()).then((data) => {
+      if (!data && ssoUrl) {
+        const url = new URL(`${ssoUrl}/auth/login`);
+        if (apiKey) {
+          url.searchParams.set("api_key", apiKey);
+        }
+        url.searchParams.set(
+          "redirect_to",
+          window.location.href
+        );
+        window.location.href = url.toString();
+        return;
+      }
       setState({
         user: data ? mapClaims(data) : null,
         isReady: true
@@ -118,7 +134,7 @@ function EgSessionProvider({ children, config }) {
     }).catch(() => {
       setState({ user: null, isReady: true });
     });
-  }, [sessionPath]);
+  }, [sessionPath, ssoUrl, apiKey]);
   return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(EgSessionContext.Provider, { value: state, children });
 }
 function mapClaims(claims) {
@@ -137,31 +153,26 @@ function mapClaims(claims) {
 // src/hooks/useSSOLogin.ts
 var import_react3 = require("react");
 function useSSOLogin(config) {
-  const {
-    ssoUrl,
-    apiKey,
-    callbackPath = "/auth/callback",
-    next = "/",
-    logoutPath = "/api/auth/signout",
-    redirectAfterLogout = "/"
-  } = config;
   const login = (0, import_react3.useCallback)(() => {
-    const callbackUrl = `${window.location.origin}${callbackPath}`;
-    const checkUrl = new URL(`${ssoUrl}/auth/check`);
-    checkUrl.searchParams.set("api_key", apiKey);
-    checkUrl.searchParams.set("redirect_to", callbackUrl);
-    checkUrl.searchParams.set("next", next);
-    checkUrl.searchParams.set("prompt", "login");
-    window.location.href = checkUrl.toString();
-  }, [ssoUrl, apiKey, callbackPath, next]);
-  const logout = (0, import_react3.useCallback)(() => {
-    const returnUrl = `${window.location.origin}${logoutPath}?redirect=${encodeURIComponent(
-      redirectAfterLogout
-    )}`;
-    const url = new URL(`${ssoUrl}/auth/signout`);
-    url.searchParams.set("redirect_to", returnUrl);
+    const url = new URL(`${config.ssoUrl}/auth/login`);
+    if (config.apiKey) {
+      url.searchParams.set("api_key", config.apiKey);
+    }
+    url.searchParams.set(
+      "redirect_to",
+      window.location.href
+    );
     window.location.href = url.toString();
-  }, [ssoUrl, logoutPath, redirectAfterLogout]);
+  }, [config]);
+  const logout = (0, import_react3.useCallback)(() => {
+    localStorage.clear();
+    const url = new URL(`${config.ssoUrl}/auth/signout`);
+    url.searchParams.set(
+      "redirect_to",
+      window.location.origin
+    );
+    window.location.href = url.toString();
+  }, [config]);
   return { login, logout };
 }
 // Annotate the CommonJS export names for ESM import in node:

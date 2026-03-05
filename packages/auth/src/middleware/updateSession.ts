@@ -1,36 +1,27 @@
-import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import type { MiddlewareConfig } from '../types';
 
-export async function updateSession(request: NextRequest, config: MiddlewareConfig) {
-  let supabaseResponse = NextResponse.next({ request });
+const EG_SESSION_COOKIE = "eg_session";
 
-  const supabase = createServerClient(
-    config.supabaseUrl,
-    config.supabaseAnonKey,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
-          cookiesToSet.forEach(({ name, value }: { name: string; value: string }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }: { name: string; value: string; options?: Record<string, unknown> }) =>
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            supabaseResponse.cookies.set(name, value, options as any)
-          );
-        },
-      },
-    }
-  );
+export function updateSession(request: NextRequest) {
 
-  // getUser() valida o JWT com o Supabase Auth server — não usar getSession() aqui
-  await supabase.auth.getUser();
+  const egSession = request.cookies.get(EG_SESSION_COOKIE)?.value;
 
-  return supabaseResponse;
+  if (!egSession) {
+
+    const loginUrl = new URL(
+      "/auth/login",
+      process.env.NEXT_PUBLIC_SSO_URL
+    );
+
+    loginUrl.searchParams.set(
+      "redirect_to",
+      request.nextUrl.href
+    );
+
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return NextResponse.next();
 }
 
 export const defaultMatcherConfig = {

@@ -12,38 +12,37 @@ export interface SSOLoginConfig {
 }
 
 export function useSSOLogin(config: SSOLoginConfig) {
-  const {
-    ssoUrl,
-    apiKey,
-    callbackPath = '/auth/callback',
-    next = '/',
-    logoutPath = '/api/auth/signout',
-    redirectAfterLogout = '/',
-  } = config;
-
   const login = useCallback(() => {
-    const callbackUrl = `${window.location.origin}${callbackPath}`;
 
-    const checkUrl = new URL(`${ssoUrl}/auth/check`);
+    const url = new URL(`${config.ssoUrl}/auth/login`)
 
-    checkUrl.searchParams.set('api_key', apiKey);
-    checkUrl.searchParams.set('redirect_to', callbackUrl);
-    checkUrl.searchParams.set('next', next);
-    checkUrl.searchParams.set('prompt', 'login');
+    if (config.apiKey) {
+      url.searchParams.set("api_key", config.apiKey)
+    }
 
-    window.location.href = checkUrl.toString();
-  }, [ssoUrl, apiKey, callbackPath, next]);
+    url.searchParams.set(
+      "redirect_to",
+      window.location.href
+    )
+
+    window.location.href = url.toString()
+
+  }, [config])
 
   const logout = useCallback(() => {
-    const returnUrl = `${window.location.origin}${logoutPath}?redirect=${encodeURIComponent(
-      redirectAfterLogout
-    )}`;
 
-    const url = new URL(`${ssoUrl}/auth/signout`);
-    url.searchParams.set("redirect_to", returnUrl);
+    localStorage.clear()
 
-    window.location.href = url.toString();
-  }, [ssoUrl, logoutPath, redirectAfterLogout]);
+    const url = new URL(`${config.ssoUrl}/auth/signout`)
 
-  return { login, logout };
+    url.searchParams.set(
+      "redirect_to",
+      window.location.origin
+    )
+
+    window.location.href = url.toString()
+
+  }, [config])
+
+  return { login, logout }
 }
