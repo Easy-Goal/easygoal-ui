@@ -17,6 +17,7 @@ export interface EgSessionUser {
   companyName: string | null;
   rankName: string | null;
   planSlug: string | null;
+  provider?: string;
 }
 
 export interface EgSessionContextValue {
