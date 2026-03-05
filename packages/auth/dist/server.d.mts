@@ -63,7 +63,7 @@ declare function handleSignout(): Promise<NextResponse>;
  */
 declare function createSignoutRoute(): () => Promise<NextResponse>;
 
-declare function updateSession(request: NextRequest): NextResponse<unknown>;
+declare function updateSession(request: NextRequest): Promise<NextResponse<unknown>>;
 declare const defaultMatcherConfig: {
     matcher: string[];
 };

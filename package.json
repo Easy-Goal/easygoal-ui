@@ -5,10 +5,18 @@
   "private": true,
   "typesVersions": {
     "*": {
-      "ui": ["./packages/ui/dist/index.d.ts"],
-      "ui/tokens": ["./packages/ui/dist/tokens/index.d.ts"],
-      "auth/client": ["./packages/auth/dist/index.d.ts"],
-      "auth/server": ["./packages/auth/dist/server.d.ts"]
+      "ui": [
+        "./packages/ui/dist/index.d.ts"
+      ],
+      "ui/tokens": [
+        "./packages/ui/dist/tokens/index.d.ts"
+      ],
+      "auth/client": [
+        "./packages/auth/dist/index.d.ts"
+      ],
+      "auth/server": [
+        "./packages/auth/dist/server.d.ts"
+      ]
     }
   },
   "exports": {
@@ -22,13 +30,11 @@
       "import": "./packages/ui/dist/tokens/index.mjs",
       "require": "./packages/ui/dist/tokens/index.js"
     },
-
     "./auth/client": {
       "types": "./packages/auth/dist/index.d.ts",
       "import": "./packages/auth/dist/index.mjs",
       "require": "./packages/auth/dist/index.js"
     },
-
     "./auth/server": {
       "types": "./packages/auth/dist/server.d.ts",
       "import": "./packages/auth/dist/server.mjs",
@@ -46,5 +52,8 @@
   },
   "devDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "jose": "^6.2.0"
   }
 }
