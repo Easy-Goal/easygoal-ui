@@ -63,7 +63,7 @@ async function handleSignout() {
   return NextResponse2.json({ success: true });
 }
 function createSignoutRoute() {
-  return async function POST() {
+  return async function POST(request) {
     return handleSignout();
   };
 }

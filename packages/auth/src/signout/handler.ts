@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * Limpa o cookie httpOnly `eg_session` server-side.
@@ -29,7 +29,7 @@ export async function handleSignout(): Promise<NextResponse> {
  * ```
  */
 export function createSignoutRoute() {
-  return async function POST(): Promise<NextResponse> {
-    return handleSignout();
+  return async function POST(request: NextRequest): Promise<NextResponse> {
+    return handleSignout(); // sua função que limpa o cookie
   };
 }

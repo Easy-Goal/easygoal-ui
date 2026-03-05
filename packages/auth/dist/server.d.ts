@@ -61,7 +61,7 @@ declare function handleSignout(): Promise<NextResponse>;
  * export const POST = createSignoutRoute();
  * ```
  */
-declare function createSignoutRoute(): () => Promise<NextResponse>;
+declare function createSignoutRoute(): (request: NextRequest) => Promise<NextResponse>;
 
 declare function updateSession(request: NextRequest): Promise<NextResponse<unknown>>;
 declare const defaultMatcherConfig: {

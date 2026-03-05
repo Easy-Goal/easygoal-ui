@@ -94,7 +94,7 @@ async function handleSignout() {
   return import_server2.NextResponse.json({ success: true });
 }
 function createSignoutRoute() {
-  return async function POST() {
+  return async function POST(request) {
     return handleSignout();
   };
 }
