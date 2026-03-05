@@ -95,40 +95,20 @@ function EgSessionProvider({ children, config }) {
     isReady: false
   });
   useEffect2(() => {
-    fetch(sessionPath).then((res) => res.json()).then((data) => {
-      if (!data && ssoUrl) {
+    fetch(sessionPath).then(async (res) => {
+      if (res.status === 401 && ssoUrl) {
         const url = new URL(`${ssoUrl}/auth/login`);
         if (apiKey) {
           url.searchParams.set("api_key", apiKey);
         }
-        url.searchParams.set(
-          "redirect_to",
-          window.location.href
-        );
+        url.searchParams.set("redirect_to", window.location.href);
         window.location.href = url.toString();
-        return;
+        return null;
       }
-      setState({
-        user: data ? mapClaims(data) : null,
-        isReady: true
-      });
-    }).catch(() => {
-      setState({ user: null, isReady: true });
+      return res.json();
     });
   }, [sessionPath, ssoUrl, apiKey]);
   return /* @__PURE__ */ jsx2(EgSessionContext.Provider, { value: state, children });
-}
-function mapClaims(claims) {
-  return {
-    id: String(claims.sub ?? ""),
-    email: claims.email,
-    name: claims.name ?? null,
-    avatarUrl: claims.avatar_url ?? null,
-    isProducer: claims.is_producer === true,
-    companyName: claims.company_name ?? null,
-    rankName: claims.rank_name ?? null,
-    planSlug: claims.plan_slug ?? null
-  };
 }
 
 // src/hooks/useSSOLogin.ts
