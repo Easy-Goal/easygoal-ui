@@ -1,29 +1,4 @@
-"use strict";
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src/tokens/index.ts
-var tokens_exports = {};
-__export(tokens_exports, {
-  colors: () => colors,
-  cssVars: () => cssVars
-});
-module.exports = __toCommonJS(tokens_exports);
+'use strict';
 
 // src/tokens/colors.ts
 var colors = {
@@ -71,9 +46,8 @@ var cssVars = {
   "--sidebar-accent-foreground": "210 40% 98%",
   "--sidebar-border": "222 47% 18%"
 };
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  colors,
-  cssVars
-});
+
+exports.colors = colors;
+exports.cssVars = cssVars;
+//# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

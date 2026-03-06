@@ -1,142 +1,134 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Logo } from "../Logo";
-import { NotificationBell, HeaderNotification } from "./NotificationBell";
-import { UserMenu, HeaderUser } from "./UserMenu";
-
-export type { HeaderUser, HeaderNotification };
-
+import { useEgSession, useSSOLogin } from "@easygoal/packages/auth/client";
+import { BookOpen, ChevronDown, Lock, LogOut, Mail } from "lucide-react";
+import Link from "next/link";
+import React, { useEffect, useRef, useState } from "react";
+import { Logo } from "../Logo"; // Ajuste conforme seu projeto
+// DEPOIS:
+// --- Interfaces ---
 export interface HeaderNavLink {
   label: string;
   href: string;
 }
 
 export interface EasyHeaderProps {
-  /** Sufixo após o logo, ex: "club", "afiliados" */
   logoSuffix?: string;
-  /** Variante de cor do logo */
   logoVariant?: "dark" | "light";
-  /** Links de navegação */
   navLinks?: HeaderNavLink[];
-
-  /** Usuário autenticado (null/undefined = não logado) */
-  user?: HeaderUser | null;
-  /** URL de login (exibida quando não logado) */
-  loginUrl?: string;
-  /** URL de configurações / perfil do usuário */
-  settingsUrl?: string;
-  /** URL da documentação */
-  docsUrl?: string;
-  /** Callback de sign out */
-  onSignOut?: () => void;
-
-  /** Notificações (só exibido quando user está presente) */
-  notifications?: HeaderNotification[];
-  onMarkNotificationRead?: (id: string) => void;
-  onMarkAllNotificationsRead?: () => void;
-  onDeleteNotification?: (id: string) => void;
-  allNotificationsUrl?: string;
-
-  /** Slot direito customizável (mostrado quando não logado ou como override) */
   ctaSlot?: React.ReactNode;
-
   className?: string;
+  // Configurações de Auth passadas via Props
+  config: {
+    ssoUrl: string;
+    apiKey: string;
+    docsUrl?: string;
+    appUrl?: string; // URL do app principal para Settings
+  };
 }
 
-const S = {
-  header: (scrolled: boolean): React.CSSProperties => ({
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 50,
-    transition: "background-color 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease",
-    ...(scrolled
-      ? {
-          backgroundColor: "hsla(220, 50%, 12%, 0.95)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-        }
-      : {
-          backgroundColor: "transparent",
-        }),
-  }),
-  inner: {
-    maxWidth: 1280,
-    margin: "0 auto",
-    padding: "0 24px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    height: 64,
-  },
-  logoWrap: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    textDecoration: "none",
-  },
-  suffix: {
-    display: "flex",
-    alignItems: "center",
-    gap: 4,
-  },
-  slash: {
-    fontFamily: "monospace",
-    fontSize: 18,
-    color: "rgba(255,255,255,0.2)",
-    lineHeight: 1,
-  },
-  suffixText: {
-    fontFamily: "monospace",
-    fontSize: 13,
-    color: "rgba(255,255,255,0.4)",
-  },
-  nav: {
-    display: "flex",
-    alignItems: "center",
-    gap: 28,
-  },
-  navLink: {
-    fontSize: 14,
-    color: "rgba(255,255,255,0.55)",
-    textDecoration: "none",
-    transition: "color 0.2s",
-  },
-  right: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-  },
-  loginLink: {
-    fontSize: 14,
-    color: "rgba(255,255,255,0.6)",
-    textDecoration: "none",
-    padding: "6px 12px",
-    borderRadius: 8,
-    border: "1px solid rgba(255,255,255,0.12)",
-    transition: "border-color 0.2s, color 0.2s",
-  },
-};
+// --- Componente Interno do Menu ---
+function HeaderUserMenu({ config }: { config: EasyHeaderProps["config"] }) {
+  const { user, isReady } = useEgSession();
+  const { login, logout } = useSSOLogin({
+    ssoUrl: config.ssoUrl,
+    apiKey: config.apiKey,
+    logoutPath: "/api/auth/signout",
+  });
 
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setIsOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  if (!isReady) return <div className="w-8 h-8" />;
+
+  if (!user) {
+    return (
+      <button
+        onClick={login}
+        className="rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:border-white/20 hover:text-white"
+      >
+        Entrar
+      </button>
+    );
+  }
+
+  const isOAuthUser = user.provider && user.provider !== "email";
+  const initials = user.name
+    ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
+    : (user.email?.[0] ?? "?").toUpperCase();
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-white/5"
+      >
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-500/10 border border-orange-500/20 overflow-hidden">
+          {user.avatarUrl ? (
+            <img src={user.avatarUrl} className="h-full w-full object-cover" alt="" />
+          ) : (
+            <span className="text-[10px] font-bold text-orange-500">{initials}</span>
+          )}
+        </div>
+        <span className="hidden max-w-[120px] truncate font-medium sm:block text-white/90">
+          {user.name?.split(" ")[0]}
+        </span>
+        <ChevronDown className={`h-4 w-4 text-white/30 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full z-50 mt-1 w-56 rounded-lg border border-white/10 bg-[#1e2536] p-1 shadow-xl">
+          <div className="px-3 py-2 border-b border-white/5">
+            <p className="truncate text-sm font-medium text-white">{user.name}</p>
+            <p className="truncate text-xs text-white/40">{user.email}</p>
+          </div>
+
+          <div className="pt-1">
+            {!isOAuthUser ? (
+              <>
+                <Link href="/settings/email" className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/5" onClick={() => setIsOpen(false)}>
+                  <Mail className="h-4 w-4 opacity-50" /> Alterar email
+                </Link>
+                <Link href="/settings/password" className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/5" onClick={() => setIsOpen(false)}>
+                  <Lock className="h-4 w-4 opacity-50" /> Alterar senha
+                </Link>
+              </>
+            ) : (
+              <div className="px-3 py-2 text-[10px] font-bold uppercase text-white/20">via {user.provider}</div>
+            )}
+
+            <a href={config.docsUrl ?? "https://docs.easygoal.com.br"} target="_blank" className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/5" onClick={() => setIsOpen(false)}>
+              <BookOpen className="h-4 w-4 opacity-50" /> Documentação
+            </a>
+          </div>
+
+          <div className="border-t border-white/5 mt-1 pt-1">
+            <button onClick={logout} className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-red-400 transition-colors hover:bg-red-400/10">
+              <LogOut className="h-4 w-4" /> Sair
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// --- Componente Principal ---
 export function EasyHeader({
   logoSuffix,
   logoVariant = "dark",
   navLinks = [],
-  user,
-  loginUrl,
-  settingsUrl,
-  docsUrl,
-  onSignOut,
-  notifications,
-  onMarkNotificationRead,
-  onMarkAllNotificationsRead,
-  onDeleteNotification,
-  allNotificationsUrl,
   ctaSlot,
   className,
+  config
 }: EasyHeaderProps) {
   const [scrolled, setScrolled] = useState(false);
 
@@ -147,70 +139,29 @@ export function EasyHeader({
   }, []);
 
   return (
-    <header style={S.header(scrolled)} className={className}>
-      <div style={S.inner}>
-        {/* Logo + sufixo */}
-        <a href="/" style={S.logoWrap}>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${scrolled ? "bg-[#0d1117]/95 backdrop-blur-md border-b border-white/5" : "bg-transparent"} ${className}`}>
+      <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-6">
+        <a href="/" className="flex items-center gap-1.5 no-underline">
           <Logo variant={logoVariant} width={108} />
           {logoSuffix && (
-            <span style={S.suffix}>
-              <span style={S.slash}>/</span>
-              <span style={S.suffixText}>{logoSuffix}</span>
-            </span>
+            <div className="flex items-center gap-1 font-mono text-sm">
+              <span className="text-lg opacity-20">/</span>
+              <span className="opacity-40">{logoSuffix}</span>
+            </div>
           )}
         </a>
 
-        {/* Nav links — hidden em mobile via minWidth */}
-        {navLinks.length > 0 && (
-          <nav
-            style={{
-              ...S.nav,
-              // Esconde em telas pequenas
-              display: "flex",
-            }}
-          >
-            {navLinks.map(({ label, href }) => (
-              <a key={href} href={href} style={S.navLink}>
-                {label}
-              </a>
-            ))}
-          </nav>
-        )}
+        <nav className="hidden items-center gap-7 md:flex">
+          {navLinks.map(({ label, href }) => (
+            <a key={href} href={href} className="text-sm text-white/55 no-underline transition-colors hover:text-white">
+              {label}
+            </a>
+          ))}
+        </nav>
 
-        {/* Right slot */}
-        <div style={S.right}>
-          {user ? (
-            <>
-              {/* Notification bell (só se notifications for fornecido) */}
-              {notifications !== undefined && (
-                <NotificationBell
-                  notifications={notifications}
-                  onMarkRead={onMarkNotificationRead}
-                  onMarkAllRead={onMarkAllNotificationsRead}
-                  onDelete={onDeleteNotification}
-                  allNotificationsUrl={allNotificationsUrl}
-                />
-              )}
-
-              {/* User menu */}
-              <UserMenu
-                user={user}
-                onSignOut={onSignOut}
-                settingsUrl={settingsUrl}
-                docsUrl={docsUrl}
-              />
-            </>
-          ) : (
-            <>
-              {ctaSlot ?? (
-                loginUrl && (
-                  <a href={loginUrl} style={S.loginLink}>
-                    Entrar
-                  </a>
-                )
-              )}
-            </>
-          )}
+        <div className="flex items-center gap-3">
+          <HeaderUserMenu config={config} />
+          {ctaSlot}
         </div>
       </div>
     </header>

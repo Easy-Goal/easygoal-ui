@@ -1,13 +1,12 @@
-import { defineConfig } from "tsup";
+import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: {
-    index: "src/index.ts",
-    "tokens/index": "src/tokens/index.ts",
-  },
-  format: ["cjs", "esm"],
+  entry: ['src/index.ts', 'src/tokens/index.ts'],
+  format: ['cjs', 'esm'],
   dts: true,
-  sourcemap: true,
+  external: ['react', 'next', 'lucide-react', '@easygoal/packages/auth/client'],
   clean: true,
-  external: ["react", "react-dom"],
+  minify: false,
+  sourcemap: true,
+  treeshake: true,
 });

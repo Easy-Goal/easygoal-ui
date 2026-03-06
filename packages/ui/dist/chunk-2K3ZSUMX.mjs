@@ -45,8 +45,6 @@ var cssVars = {
   "--sidebar-border": "222 47% 18%"
 };
 
-export {
-  colors,
-  cssVars
-};
+export { colors, cssVars };
+//# sourceMappingURL=chunk-2K3ZSUMX.mjs.map
 //# sourceMappingURL=chunk-2K3ZSUMX.mjs.map

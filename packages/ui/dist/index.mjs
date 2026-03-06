@@ -1,10 +1,10 @@
-import {
-  colors,
-  cssVars
-} from "./chunk-2K3ZSUMX.mjs";
+export { colors, cssVars } from './chunk-2K3ZSUMX.mjs';
+import { jsxs, jsx, Fragment } from 'react/jsx-runtime';
+import { useEgSession, useSSOLogin } from '@easygoal/packages/auth/client';
+import { ChevronDown, Mail, Lock, BookOpen, LogOut } from 'lucide-react';
+import Link from 'next/link';
+import { useState, useEffect, useRef } from 'react';
 
-// src/components/Logo/Logo.tsx
-import { jsx, jsxs } from "react/jsx-runtime";
 var TEXT_COLOR = {
   dark: "#FAFAFA",
   light: "#09090B"
@@ -85,273 +85,108 @@ function Logo({ variant = "dark", width = 133, className }) {
     }
   );
 }
-
-// src/components/Header/Header.tsx
-import { useEffect as useEffect3, useState as useState3 } from "react";
-
-// src/components/Header/NotificationBell.tsx
-import { useEffect, useRef, useState } from "react";
-import { Fragment, jsx as jsx2, jsxs as jsxs2 } from "react/jsx-runtime";
-function formatTimeAgo(dateString) {
-  const diff = Date.now() - new Date(dateString).getTime();
-  const mins = Math.floor(diff / 6e4);
-  const hours = Math.floor(diff / 36e5);
-  const days = Math.floor(diff / 864e5);
-  if (mins < 1) return "Agora";
-  if (mins < 60) return `${mins}min`;
-  if (hours < 24) return `${hours}h`;
-  if (days < 7) return `${days}d`;
-  return new Date(dateString).toLocaleDateString("pt-BR");
-}
-var S = {
-  wrap: {
-    position: "relative"
-  },
-  btn: {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    border: "none",
-    background: "transparent",
-    cursor: "pointer",
-    color: "inherit",
-    padding: 0
-  },
-  badge: {
-    position: "absolute",
-    top: -2,
-    right: -2,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: "#ef4444",
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: 700,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "0 4px",
-    lineHeight: 1
-  },
-  dropdown: {
-    position: "absolute",
-    right: 0,
-    top: "calc(100% + 8px)",
-    width: 320,
-    borderRadius: 10,
-    border: "1px solid rgba(255,255,255,0.1)",
-    backgroundColor: "hsl(220 45% 17%)",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-    zIndex: 100,
-    overflow: "hidden"
-  },
-  dropdownHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "12px 16px",
-    borderBottom: "1px solid rgba(255,255,255,0.08)"
-  },
-  dropdownTitle: {
-    fontSize: 14,
-    fontWeight: 600,
-    margin: 0,
-    color: "hsl(0 0% 100%)"
-  },
-  markAllBtn: {
-    fontSize: 11,
-    color: "hsl(18 100% 62%)",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    padding: 0
-  },
-  list: {
-    maxHeight: 360,
-    overflowY: "auto"
-  },
-  empty: {
-    padding: "24px 16px",
-    textAlign: "center",
-    fontSize: 13,
-    color: "rgba(255,255,255,0.4)"
-  },
-  item: (isUnread) => ({
-    display: "flex",
-    alignItems: "flex-start",
-    gap: 10,
-    padding: "10px 16px",
-    borderBottom: "1px solid rgba(255,255,255,0.05)",
-    backgroundColor: isUnread ? "rgba(249,115,22,0.06)" : "transparent",
-    cursor: "pointer",
-    textDecoration: "none"
-  }),
-  dot: {
-    width: 7,
-    height: 7,
-    borderRadius: "50%",
-    backgroundColor: "hsl(18 100% 62%)",
-    flexShrink: 0,
-    marginTop: 5
-  },
-  itemContent: {
-    flex: 1,
-    minWidth: 0
-  },
-  itemTitle: (isUnread) => ({
-    fontSize: 13,
-    fontWeight: isUnread ? 600 : 400,
-    color: "hsl(0 0% 100%)",
-    margin: 0,
-    lineHeight: 1.4
-  }),
-  itemMsg: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.5)",
-    margin: "2px 0 0",
-    lineHeight: 1.4,
-    display: "-webkit-box",
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: "vertical",
-    overflow: "hidden"
-  },
-  itemTime: {
-    fontSize: 11,
-    color: "rgba(255,255,255,0.35)",
-    margin: "3px 0 0"
-  },
-  actions: {
-    display: "flex",
-    gap: 2,
-    flexShrink: 0,
-    marginTop: 1
-  },
-  actionBtn: {
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    padding: 3,
-    borderRadius: 4,
-    color: "rgba(255,255,255,0.35)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  footer: {
-    padding: "8px 16px",
-    borderTop: "1px solid rgba(255,255,255,0.08)",
-    textAlign: "center"
-  },
-  footerLink: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.5)",
-    textDecoration: "none"
-  }
-};
-var BellIcon = () => /* @__PURE__ */ jsxs2("svg", { width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-  /* @__PURE__ */ jsx2("path", { d: "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" }),
-  /* @__PURE__ */ jsx2("path", { d: "M13.73 21a2 2 0 0 1-3.46 0" })
-] });
-var CheckIcon = () => /* @__PURE__ */ jsx2("svg", { width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx2("polyline", { points: "20 6 9 17 4 12" }) });
-var TrashIcon = () => /* @__PURE__ */ jsxs2("svg", { width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-  /* @__PURE__ */ jsx2("polyline", { points: "3 6 5 6 21 6" }),
-  /* @__PURE__ */ jsx2("path", { d: "M19 6l-1 14H6L5 6" }),
-  /* @__PURE__ */ jsx2("path", { d: "M10 11v6M14 11v6" }),
-  /* @__PURE__ */ jsx2("path", { d: "M9 6V4h6v2" })
-] });
-function NotificationBell({
-  notifications = [],
-  onMarkRead,
-  onMarkAllRead,
-  onDelete,
-  allNotificationsUrl
-}) {
+function HeaderUserMenu({ config }) {
+  const { user, isReady } = useEgSession();
+  const { login, logout } = useSSOLogin({
+    ssoUrl: config.ssoUrl,
+    apiKey: config.apiKey,
+    logoutPath: "/api/auth/signout"
+  });
   const [isOpen, setIsOpen] = useState(false);
-  const ref = useRef(null);
-  const unread = notifications.filter((n) => !n.readAt);
-  const unreadCount = unread.length;
+  const containerRef = useRef(null);
   useEffect(() => {
     const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setIsOpen(false);
+      if (containerRef.current && !containerRef.current.contains(e.target)) setIsOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
-  return /* @__PURE__ */ jsxs2("div", { style: S.wrap, ref, children: [
-    /* @__PURE__ */ jsxs2(
+  if (!isReady) return /* @__PURE__ */ jsx("div", { className: "w-8 h-8" });
+  if (!user) {
+    return /* @__PURE__ */ jsx(
       "button",
       {
-        style: S.btn,
-        onClick: () => setIsOpen((o) => !o),
-        "aria-label": `Notifica\xE7\xF5es${unreadCount > 0 ? ` (${unreadCount} n\xE3o lidas)` : ""}`,
+        onClick: login,
+        className: "rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:border-white/20 hover:text-white",
+        children: "Entrar"
+      }
+    );
+  }
+  const isOAuthUser = user.provider && user.provider !== "email";
+  const initials = user.name ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase() : (user.email?.[0] ?? "?").toUpperCase();
+  return /* @__PURE__ */ jsxs("div", { ref: containerRef, className: "relative", children: [
+    /* @__PURE__ */ jsxs(
+      "button",
+      {
+        onClick: () => setIsOpen(!isOpen),
+        className: "flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-white/5",
         children: [
-          /* @__PURE__ */ jsx2(BellIcon, {}),
-          unreadCount > 0 && /* @__PURE__ */ jsx2("span", { style: S.badge, children: unreadCount > 9 ? "9+" : unreadCount })
+          /* @__PURE__ */ jsx("div", { className: "flex h-7 w-7 items-center justify-center rounded-full bg-orange-500/10 border border-orange-500/20 overflow-hidden", children: user.avatarUrl ? /* @__PURE__ */ jsx("img", { src: user.avatarUrl, className: "h-full w-full object-cover", alt: "" }) : /* @__PURE__ */ jsx("span", { className: "text-[10px] font-bold text-orange-500", children: initials }) }),
+          /* @__PURE__ */ jsx("span", { className: "hidden max-w-[120px] truncate font-medium sm:block text-white/90", children: user.name?.split(" ")[0] }),
+          /* @__PURE__ */ jsx(ChevronDown, { className: `h-4 w-4 text-white/30 transition-transform ${isOpen ? "rotate-180" : ""}` })
         ]
       }
     ),
-    isOpen && /* @__PURE__ */ jsxs2("div", { style: S.dropdown, children: [
-      /* @__PURE__ */ jsxs2("div", { style: S.dropdownHeader, children: [
-        /* @__PURE__ */ jsx2("p", { style: S.dropdownTitle, children: "Notifica\xE7\xF5es" }),
-        unreadCount > 0 && onMarkAllRead && /* @__PURE__ */ jsx2("button", { style: S.markAllBtn, onClick: () => onMarkAllRead(), children: "Marcar todas como lidas" })
+    isOpen && /* @__PURE__ */ jsxs("div", { className: "absolute right-0 top-full z-50 mt-1 w-56 rounded-lg border border-white/10 bg-[#1e2536] p-1 shadow-xl", children: [
+      /* @__PURE__ */ jsxs("div", { className: "px-3 py-2 border-b border-white/5", children: [
+        /* @__PURE__ */ jsx("p", { className: "truncate text-sm font-medium text-white", children: user.name }),
+        /* @__PURE__ */ jsx("p", { className: "truncate text-xs text-white/40", children: user.email })
       ] }),
-      /* @__PURE__ */ jsx2("div", { style: S.list, children: notifications.length === 0 ? /* @__PURE__ */ jsx2("p", { style: S.empty, children: "Nenhuma notifica\xE7\xE3o" }) : notifications.slice(0, 10).map((n) => {
-        const isUnread = !n.readAt;
-        const inner = /* @__PURE__ */ jsxs2(Fragment, { children: [
-          isUnread && /* @__PURE__ */ jsx2("span", { style: S.dot }),
-          /* @__PURE__ */ jsxs2("div", { style: S.itemContent, children: [
-            /* @__PURE__ */ jsx2("p", { style: S.itemTitle(isUnread), children: n.title }),
-            /* @__PURE__ */ jsx2("p", { style: S.itemMsg, children: n.message }),
-            /* @__PURE__ */ jsx2("p", { style: S.itemTime, children: formatTimeAgo(n.createdAt) })
+      /* @__PURE__ */ jsxs("div", { className: "pt-1", children: [
+        !isOAuthUser ? /* @__PURE__ */ jsxs(Fragment, { children: [
+          /* @__PURE__ */ jsxs(Link, { href: "/settings/email", className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/5", onClick: () => setIsOpen(false), children: [
+            /* @__PURE__ */ jsx(Mail, { className: "h-4 w-4 opacity-50" }),
+            " Alterar email"
           ] }),
-          /* @__PURE__ */ jsxs2("div", { style: S.actions, children: [
-            isUnread && onMarkRead && /* @__PURE__ */ jsx2(
-              "button",
-              {
-                style: S.actionBtn,
-                title: "Marcar como lida",
-                onClick: (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onMarkRead(n.id);
-                },
-                children: /* @__PURE__ */ jsx2(CheckIcon, {})
-              }
-            ),
-            onDelete && /* @__PURE__ */ jsx2(
-              "button",
-              {
-                style: S.actionBtn,
-                title: "Remover",
-                onClick: (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onDelete(n.id);
-                },
-                children: /* @__PURE__ */ jsx2(TrashIcon, {})
-              }
-            )
+          /* @__PURE__ */ jsxs(Link, { href: "/settings/password", className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/5", onClick: () => setIsOpen(false), children: [
+            /* @__PURE__ */ jsx(Lock, { className: "h-4 w-4 opacity-50" }),
+            " Alterar senha"
           ] })
-        ] });
-        return n.actionUrl ? /* @__PURE__ */ jsx2("a", { href: n.actionUrl, style: S.item(isUnread), onClick: () => setIsOpen(false), children: inner }, n.id) : /* @__PURE__ */ jsx2("div", { style: S.item(isUnread), onClick: () => {
-          if (isUnread && onMarkRead) onMarkRead(n.id);
-        }, children: inner }, n.id);
-      }) }),
-      allNotificationsUrl && notifications.length > 10 && /* @__PURE__ */ jsx2("div", { style: S.footer, children: /* @__PURE__ */ jsx2("a", { href: allNotificationsUrl, style: S.footerLink, onClick: () => setIsOpen(false), children: "Ver todas as notifica\xE7\xF5es" }) })
+        ] }) : /* @__PURE__ */ jsxs("div", { className: "px-3 py-2 text-[10px] font-bold uppercase text-white/20", children: [
+          "via ",
+          user.provider
+        ] }),
+        /* @__PURE__ */ jsxs("a", { href: config.docsUrl ?? "https://docs.easygoal.com.br", target: "_blank", className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/5", onClick: () => setIsOpen(false), children: [
+          /* @__PURE__ */ jsx(BookOpen, { className: "h-4 w-4 opacity-50" }),
+          " Documenta\xE7\xE3o"
+        ] })
+      ] }),
+      /* @__PURE__ */ jsx("div", { className: "border-t border-white/5 mt-1 pt-1", children: /* @__PURE__ */ jsxs("button", { onClick: logout, className: "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-red-400 transition-colors hover:bg-red-400/10", children: [
+        /* @__PURE__ */ jsx(LogOut, { className: "h-4 w-4" }),
+        " Sair"
+      ] }) })
     ] })
   ] });
 }
-
-// src/components/Header/UserMenu.tsx
-import { useEffect as useEffect2, useRef as useRef2, useState as useState2 } from "react";
-
-// src/components/Header/RankBadge.tsx
-import { jsx as jsx3, jsxs as jsxs3 } from "react/jsx-runtime";
+function EasyHeader({
+  logoSuffix,
+  logoVariant = "dark",
+  navLinks = [],
+  ctaSlot,
+  className,
+  config
+}) {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return /* @__PURE__ */ jsx("header", { className: `fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${scrolled ? "bg-[#0d1117]/95 backdrop-blur-md border-b border-white/5" : "bg-transparent"} ${className}`, children: /* @__PURE__ */ jsxs("div", { className: "mx-auto flex h-16 max-w-[1280px] items-center justify-between px-6", children: [
+    /* @__PURE__ */ jsxs("a", { href: "/", className: "flex items-center gap-1.5 no-underline", children: [
+      /* @__PURE__ */ jsx(Logo, { variant: logoVariant, width: 108 }),
+      logoSuffix && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-1 font-mono text-sm", children: [
+        /* @__PURE__ */ jsx("span", { className: "text-lg opacity-20", children: "/" }),
+        /* @__PURE__ */ jsx("span", { className: "opacity-40", children: logoSuffix })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsx("nav", { className: "hidden items-center gap-7 md:flex", children: navLinks.map(({ label, href }) => /* @__PURE__ */ jsx("a", { href, className: "text-sm text-white/55 no-underline transition-colors hover:text-white", children: label }, href)) }),
+    /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3", children: [
+      /* @__PURE__ */ jsx(HeaderUserMenu, { config }),
+      ctaSlot
+    ] })
+  ] }) });
+}
 var RANK_CONFIG = {
   bronze: { emoji: "\u{1F949}", color: "#CD7F32", label: "Bronze" },
   silver: { emoji: "\u{1F948}", color: "#C0C0C0", label: "Prata" },
@@ -367,7 +202,7 @@ var SIZE_STYLES = {
 function RankBadge({ rankName, size = "sm", showLabel = true, className }) {
   const config = RANK_CONFIG[rankName] ?? RANK_CONFIG.bronze;
   const s = SIZE_STYLES[size];
-  return /* @__PURE__ */ jsxs3(
+  return /* @__PURE__ */ jsxs(
     "span",
     {
       className,
@@ -387,336 +222,13 @@ function RankBadge({ rankName, size = "sm", showLabel = true, className }) {
       },
       title: config.label,
       children: [
-        /* @__PURE__ */ jsx3("span", { children: config.emoji }),
-        showLabel && /* @__PURE__ */ jsx3("span", { children: config.label })
+        /* @__PURE__ */ jsx("span", { children: config.emoji }),
+        showLabel && /* @__PURE__ */ jsx("span", { children: config.label })
       ]
     }
   );
 }
 
-// src/components/Header/UserMenu.tsx
-import { jsx as jsx4, jsxs as jsxs4 } from "react/jsx-runtime";
-var S2 = {
-  wrap: { position: "relative" },
-  trigger: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "4px 8px",
-    borderRadius: 8,
-    border: "none",
-    background: "transparent",
-    cursor: "pointer",
-    color: "inherit",
-    fontSize: 14,
-    fontWeight: 500
-  },
-  avatar: (hasImage) => ({
-    width: 30,
-    height: 30,
-    borderRadius: "50%",
-    backgroundColor: "rgba(249,115,22,0.15)",
-    border: "1.5px solid rgba(249,115,22,0.3)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 12,
-    fontWeight: 700,
-    color: "hsl(18 100% 62%)",
-    overflow: "hidden",
-    flexShrink: 0,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    ...hasImage ? {} : {}
-  }),
-  chevron: {
-    opacity: 0.5,
-    display: "flex",
-    alignItems: "center"
-  },
-  dropdown: {
-    position: "absolute",
-    right: 0,
-    top: "calc(100% + 8px)",
-    width: 224,
-    borderRadius: 10,
-    border: "1px solid rgba(255,255,255,0.1)",
-    backgroundColor: "hsl(220 45% 17%)",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-    zIndex: 100,
-    overflow: "hidden",
-    padding: "4px 0"
-  },
-  userInfo: {
-    padding: "10px 14px 12px",
-    borderBottom: "1px solid rgba(255,255,255,0.08)"
-  },
-  userName: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: "hsl(0 0% 100%)",
-    margin: "0 0 2px",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap"
-  },
-  userEmail: {
-    fontSize: 11,
-    color: "rgba(255,255,255,0.45)",
-    margin: 0,
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap"
-  },
-  section: {
-    padding: "4px 0",
-    borderBottom: "1px solid rgba(255,255,255,0.08)"
-  },
-  menuItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    width: "100%",
-    padding: "8px 14px",
-    fontSize: 13,
-    color: "rgba(255,255,255,0.8)",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    textDecoration: "none",
-    textAlign: "left"
-  },
-  menuItemDanger: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    width: "100%",
-    padding: "8px 14px",
-    fontSize: 13,
-    color: "#f87171",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    textDecoration: "none",
-    textAlign: "left"
-  }
-};
-var ChevronDown = () => /* @__PURE__ */ jsx4("svg", { width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsx4("polyline", { points: "6 9 12 15 18 9" }) });
-var UserIcon = () => /* @__PURE__ */ jsxs4("svg", { width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-  /* @__PURE__ */ jsx4("path", { d: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" }),
-  /* @__PURE__ */ jsx4("circle", { cx: "12", cy: "7", r: "4" })
-] });
-var BookIcon = () => /* @__PURE__ */ jsxs4("svg", { width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-  /* @__PURE__ */ jsx4("path", { d: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20" }),
-  /* @__PURE__ */ jsx4("path", { d: "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" })
-] });
-var LogOutIcon = () => /* @__PURE__ */ jsxs4("svg", { width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
-  /* @__PURE__ */ jsx4("path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" }),
-  /* @__PURE__ */ jsx4("polyline", { points: "16 17 21 12 16 7" }),
-  /* @__PURE__ */ jsx4("line", { x1: "21", y1: "12", x2: "9", y2: "12" })
-] });
-function UserMenu({ user, onSignOut, settingsUrl, docsUrl }) {
-  const [isOpen, setIsOpen] = useState2(false);
-  const ref = useRef2(null);
-  const initials = user.name ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase() : (user.email?.[0] ?? "?").toUpperCase();
-  const firstName = user.name?.split(" ")[0] ?? user.email?.split("@")[0] ?? "Usu\xE1rio";
-  useEffect2(() => {
-    const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setIsOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-  return /* @__PURE__ */ jsxs4("div", { style: S2.wrap, ref, children: [
-    /* @__PURE__ */ jsxs4("button", { style: S2.trigger, onClick: () => setIsOpen((o) => !o), children: [
-      user.avatarUrl ? /* @__PURE__ */ jsx4(
-        "img",
-        {
-          src: user.avatarUrl,
-          alt: user.name ?? "Avatar",
-          style: { ...S2.avatar(true), objectFit: "cover" },
-          width: 30,
-          height: 30
-        }
-      ) : /* @__PURE__ */ jsx4("span", { style: S2.avatar(false), children: initials }),
-      user.rankName && /* @__PURE__ */ jsx4(RankBadge, { rankName: user.rankName, size: "sm", showLabel: false }),
-      /* @__PURE__ */ jsx4("span", { style: { maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 13 }, children: firstName }),
-      /* @__PURE__ */ jsx4("span", { style: S2.chevron, children: /* @__PURE__ */ jsx4(ChevronDown, {}) })
-    ] }),
-    isOpen && /* @__PURE__ */ jsxs4("div", { style: S2.dropdown, children: [
-      /* @__PURE__ */ jsxs4("div", { style: S2.userInfo, children: [
-        /* @__PURE__ */ jsx4("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }, children: user.rankName && /* @__PURE__ */ jsx4(RankBadge, { rankName: user.rankName, size: "sm", showLabel: true }) }),
-        /* @__PURE__ */ jsx4("p", { style: S2.userName, children: user.name ?? user.email }),
-        user.email && /* @__PURE__ */ jsx4("p", { style: S2.userEmail, children: user.email })
-      ] }),
-      /* @__PURE__ */ jsxs4("div", { style: S2.section, children: [
-        settingsUrl && /* @__PURE__ */ jsxs4("a", { href: settingsUrl, style: S2.menuItem, onClick: () => setIsOpen(false), children: [
-          /* @__PURE__ */ jsx4(UserIcon, {}),
-          " Meu perfil"
-        ] }),
-        docsUrl && /* @__PURE__ */ jsxs4("a", { href: docsUrl, target: "_blank", rel: "noopener noreferrer", style: S2.menuItem, onClick: () => setIsOpen(false), children: [
-          /* @__PURE__ */ jsx4(BookIcon, {}),
-          " Documenta\xE7\xE3o"
-        ] })
-      ] }),
-      /* @__PURE__ */ jsx4("div", { style: { padding: "4px 0" }, children: onSignOut && /* @__PURE__ */ jsxs4("button", { style: S2.menuItemDanger, onClick: () => {
-        setIsOpen(false);
-        onSignOut();
-      }, children: [
-        /* @__PURE__ */ jsx4(LogOutIcon, {}),
-        " Sair"
-      ] }) })
-    ] })
-  ] });
-}
-
-// src/components/Header/Header.tsx
-import { Fragment as Fragment2, jsx as jsx5, jsxs as jsxs5 } from "react/jsx-runtime";
-var S3 = {
-  header: (scrolled) => ({
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 50,
-    transition: "background-color 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease",
-    ...scrolled ? {
-      backgroundColor: "hsla(220, 50%, 12%, 0.95)",
-      backdropFilter: "blur(20px)",
-      WebkitBackdropFilter: "blur(20px)",
-      borderBottom: "1px solid rgba(255,255,255,0.06)"
-    } : {
-      backgroundColor: "transparent"
-    }
-  }),
-  inner: {
-    maxWidth: 1280,
-    margin: "0 auto",
-    padding: "0 24px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    height: 64
-  },
-  logoWrap: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    textDecoration: "none"
-  },
-  suffix: {
-    display: "flex",
-    alignItems: "center",
-    gap: 4
-  },
-  slash: {
-    fontFamily: "monospace",
-    fontSize: 18,
-    color: "rgba(255,255,255,0.2)",
-    lineHeight: 1
-  },
-  suffixText: {
-    fontFamily: "monospace",
-    fontSize: 13,
-    color: "rgba(255,255,255,0.4)"
-  },
-  nav: {
-    display: "flex",
-    alignItems: "center",
-    gap: 28
-  },
-  navLink: {
-    fontSize: 14,
-    color: "rgba(255,255,255,0.55)",
-    textDecoration: "none",
-    transition: "color 0.2s"
-  },
-  right: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8
-  },
-  loginLink: {
-    fontSize: 14,
-    color: "rgba(255,255,255,0.6)",
-    textDecoration: "none",
-    padding: "6px 12px",
-    borderRadius: 8,
-    border: "1px solid rgba(255,255,255,0.12)",
-    transition: "border-color 0.2s, color 0.2s"
-  }
-};
-function EasyHeader({
-  logoSuffix,
-  logoVariant = "dark",
-  navLinks = [],
-  user,
-  loginUrl,
-  settingsUrl,
-  docsUrl,
-  onSignOut,
-  notifications,
-  onMarkNotificationRead,
-  onMarkAllNotificationsRead,
-  onDeleteNotification,
-  allNotificationsUrl,
-  ctaSlot,
-  className
-}) {
-  const [scrolled, setScrolled] = useState3(false);
-  useEffect3(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  return /* @__PURE__ */ jsx5("header", { style: S3.header(scrolled), className, children: /* @__PURE__ */ jsxs5("div", { style: S3.inner, children: [
-    /* @__PURE__ */ jsxs5("a", { href: "/", style: S3.logoWrap, children: [
-      /* @__PURE__ */ jsx5(Logo, { variant: logoVariant, width: 108 }),
-      logoSuffix && /* @__PURE__ */ jsxs5("span", { style: S3.suffix, children: [
-        /* @__PURE__ */ jsx5("span", { style: S3.slash, children: "/" }),
-        /* @__PURE__ */ jsx5("span", { style: S3.suffixText, children: logoSuffix })
-      ] })
-    ] }),
-    navLinks.length > 0 && /* @__PURE__ */ jsx5(
-      "nav",
-      {
-        style: {
-          ...S3.nav,
-          // Esconde em telas pequenas
-          display: "flex"
-        },
-        children: navLinks.map(({ label, href }) => /* @__PURE__ */ jsx5("a", { href, style: S3.navLink, children: label }, href))
-      }
-    ),
-    /* @__PURE__ */ jsx5("div", { style: S3.right, children: user ? /* @__PURE__ */ jsxs5(Fragment2, { children: [
-      notifications !== void 0 && /* @__PURE__ */ jsx5(
-        NotificationBell,
-        {
-          notifications,
-          onMarkRead: onMarkNotificationRead,
-          onMarkAllRead: onMarkAllNotificationsRead,
-          onDelete: onDeleteNotification,
-          allNotificationsUrl
-        }
-      ),
-      /* @__PURE__ */ jsx5(
-        UserMenu,
-        {
-          user,
-          onSignOut,
-          settingsUrl,
-          docsUrl
-        }
-      )
-    ] }) : /* @__PURE__ */ jsx5(Fragment2, { children: ctaSlot ?? (loginUrl && /* @__PURE__ */ jsx5("a", { href: loginUrl, style: S3.loginLink, children: "Entrar" })) }) })
-  ] }) });
-}
-export {
-  EasyHeader,
-  Logo,
-  RANK_CONFIG,
-  RankBadge,
-  colors,
-  cssVars
-};
+export { EasyHeader, Logo, RANK_CONFIG, RankBadge };
+//# sourceMappingURL=index.mjs.map
 //# sourceMappingURL=index.mjs.map

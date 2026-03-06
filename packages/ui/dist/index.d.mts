@@ -22,14 +22,24 @@ interface LogoProps {
  */
 declare function Logo({ variant, width, className }: LogoProps): react_jsx_runtime.JSX.Element;
 
-interface HeaderNotification {
-    id: string;
-    title: string;
-    message: string;
-    readAt: string | null;
-    createdAt: string;
-    actionUrl?: string | null;
+interface HeaderNavLink {
+    label: string;
+    href: string;
 }
+interface EasyHeaderProps {
+    logoSuffix?: string;
+    logoVariant?: "dark" | "light";
+    navLinks?: HeaderNavLink[];
+    ctaSlot?: React.ReactNode;
+    className?: string;
+    config: {
+        ssoUrl: string;
+        apiKey: string;
+        docsUrl?: string;
+        appUrl?: string;
+    };
+}
+declare function EasyHeader({ logoSuffix, logoVariant, navLinks, ctaSlot, className, config }: EasyHeaderProps): react_jsx_runtime.JSX.Element;
 
 interface HeaderUser {
     id: string;
@@ -39,38 +49,14 @@ interface HeaderUser {
     rankName?: string | null;
 }
 
-interface HeaderNavLink {
-    label: string;
-    href: string;
+interface HeaderNotification {
+    id: string;
+    title: string;
+    message: string;
+    readAt: string | null;
+    createdAt: string;
+    actionUrl?: string | null;
 }
-interface EasyHeaderProps {
-    /** Sufixo após o logo, ex: "club", "afiliados" */
-    logoSuffix?: string;
-    /** Variante de cor do logo */
-    logoVariant?: "dark" | "light";
-    /** Links de navegação */
-    navLinks?: HeaderNavLink[];
-    /** Usuário autenticado (null/undefined = não logado) */
-    user?: HeaderUser | null;
-    /** URL de login (exibida quando não logado) */
-    loginUrl?: string;
-    /** URL de configurações / perfil do usuário */
-    settingsUrl?: string;
-    /** URL da documentação */
-    docsUrl?: string;
-    /** Callback de sign out */
-    onSignOut?: () => void;
-    /** Notificações (só exibido quando user está presente) */
-    notifications?: HeaderNotification[];
-    onMarkNotificationRead?: (id: string) => void;
-    onMarkAllNotificationsRead?: () => void;
-    onDeleteNotification?: (id: string) => void;
-    allNotificationsUrl?: string;
-    /** Slot direito customizável (mostrado quando não logado ou como override) */
-    ctaSlot?: React.ReactNode;
-    className?: string;
-}
-declare function EasyHeader({ logoSuffix, logoVariant, navLinks, user, loginUrl, settingsUrl, docsUrl, onSignOut, notifications, onMarkNotificationRead, onMarkAllNotificationsRead, onDeleteNotification, allNotificationsUrl, ctaSlot, className, }: EasyHeaderProps): react_jsx_runtime.JSX.Element;
 
 declare const RANK_CONFIG: Record<string, {
     emoji: string;
