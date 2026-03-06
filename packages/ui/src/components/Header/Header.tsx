@@ -2,16 +2,39 @@
 
 import { useEgSession, useSSOLogin } from "@easygoal/packages/auth/client";
 import {
+  BookOpen,
   ChevronDown,
-  LogOut
+  LayoutDashboard,
+  Lock,
+  LogOut,
+  Settings
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { EasyHeaderProps } from ".";
+import React, { useEffect, useRef, useState } from "react";
 import { Logo } from "../Logo";
-import { NotificationBell } from "./NotificationBell"; // Importando o componente corrigido
+import { NotificationBell } from "./NotificationBell";
 
-// ... (Interfaces HeaderNavLink e EasyHeaderProps mantidas)
+// --- Interfaces ---
+export interface HeaderNavLink {
+  label: string;
+  href: string;
+}
 
+export interface EasyHeaderProps {
+  logoSuffix?: string;
+  logoVariant?: "dark" | "light";
+  navLinks?: HeaderNavLink[];
+  ctaSlot?: React.ReactNode;
+  className?: string;
+  config: {
+    ssoUrl: string;
+    apiKey: string;
+    docsUrl?: string;
+    appUrl?: string; // URL do app principal para redirecionamentos centralizados
+  };
+  notifications?: any[];
+}
+
+// --- Componente Interno do Menu do Usuário ---
 function HeaderUserMenu({ config, notifications }: {
   config: EasyHeaderProps["config"],
   notifications?: any[]
@@ -26,6 +49,7 @@ function HeaderUserMenu({ config, notifications }: {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Helper para garantir links absolutos para o App Principal (Easy Goal Admin/Dashboard)
   const getAppUrl = (path: string) => {
     const baseUrl = config.appUrl || "https://app.easygoal.com.br";
     return `${baseUrl}${path}`;
@@ -47,7 +71,7 @@ function HeaderUserMenu({ config, notifications }: {
     : (user.email?.[0] ?? "?").toUpperCase();
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-4">
       {/* Sino de Notificação Global ao lado do perfil */}
       <NotificationBell
         notifications={notifications}
@@ -73,14 +97,44 @@ function HeaderUserMenu({ config, notifications }: {
         </button>
 
         {isOpen && (
-          /* Correção: Background sólido e z-index alto para evitar transparência */
-          <div className="absolute right-0 top-full z-[100] mt-2 w-64 rounded-xl border border-white/10 bg-[#1e2536] p-1.5 shadow-2xl">
+          /* Correção de Background sólido e Z-index para evitar transparência */
+          <div className="absolute right-0 top-full z-[100] mt-2 w-64 rounded-xl border border-white/10 bg-[#1e2536] p-1.5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            {/* Identidade */}
             <div className="px-3 py-3 border-b border-white/5">
               <p className="truncate text-sm font-semibold text-white">{user.name}</p>
               <p className="truncate text-[11px] text-white/40">{user.email}</p>
             </div>
-            {/* ... (Links de navegação centralizada mantidos) */}
+
+            {/* Navegação de Ecossistema - Centralizada */}
+            <div className="py-1 border-b border-white/5">
+              <a href={getAppUrl("/dashboard")} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5 transition-colors">
+                <LayoutDashboard className="h-4 w-4 opacity-50" /> Painel Principal
+              </a>
+            </div>
+
+            {/* Configurações Centrais */}
+            <div className="py-1 border-b border-white/5">
+              <div className="px-3 py-1.5 text-[10px] font-bold text-white/20 uppercase tracking-wider">
+                Configurações
+              </div>
+              <a href={getAppUrl("/settings/profile")} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5">
+                <Settings className="h-4 w-4 opacity-50" /> Editar Perfil
+              </a>
+              {!isOAuthUser && (
+                <a href={getAppUrl("/settings/security")} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5">
+                  <Lock className="h-4 w-4 opacity-50" /> Segurança
+                </a>
+              )}
+              {isOAuthUser && (
+                <div className="px-3 py-2 text-[10px] font-bold uppercase text-white/10">via {user.provider}</div>
+              )}
+            </div>
+
+            {/* Ajuda e Sair */}
             <div className="py-1">
+              <a href={config.docsUrl || "https://docs.easygoal.com.br"} target="_blank" className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5">
+                <BookOpen className="h-4 w-4 opacity-50" /> Documentação
+              </a>
               <button onClick={logout} className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 transition-colors">
                 <LogOut className="h-4 w-4" /> Sair da conta
               </button>
@@ -92,6 +146,7 @@ function HeaderUserMenu({ config, notifications }: {
   );
 }
 
+// --- Componente Principal EasyHeader ---
 export function EasyHeader({
   logoSuffix,
   logoVariant = "dark",
@@ -100,7 +155,7 @@ export function EasyHeader({
   className,
   config,
   notifications
-}: EasyHeaderProps & { notifications?: any[] }) {
+}: EasyHeaderProps) {
   const { user, isReady } = useEgSession();
   const [scrolled, setScrolled] = useState(false);
 
@@ -115,7 +170,7 @@ export function EasyHeader({
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-6">
         <a href="/" className="flex items-center gap-1.5 no-underline shrink-0">
           <Logo variant={logoVariant} width={108} />
-          {/* Opcional: Só mostra o sufixo se a prop existir */}
+          {/* Lógica de sufixo opcional - só renderiza se existir */}
           {logoSuffix && (
             <div className="flex items-center gap-1 font-mono text-sm">
               <span className="text-lg opacity-20">/</span>
@@ -124,9 +179,9 @@ export function EasyHeader({
           )}
         </a>
 
-        {/* Navegação central com espaçamento corrigido */}
+        {/* Navegação centralizada com espaçamento corrigido (gap-8) */}
         <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map(({ label, href }: { label: string, href: string }) => (
+          {navLinks.map(({ label, href }) => (
             <a key={href} href={href} className="text-sm text-white/55 no-underline transition-colors hover:text-white">
               {label}
             </a>
@@ -134,7 +189,7 @@ export function EasyHeader({
         </nav>
 
         <div className="flex items-center gap-3 shrink-0">
-          {/* Lógica: Se logado, mostra Perfil + Sino. Se deslogado, mostra CTAs ativos */}
+          {/* Lógica: Se logado, mostra Perfil + Sino. Se deslogado, mostra CTAs ativos via Slot */}
           {user ? (
             <HeaderUserMenu config={config} notifications={notifications} />
           ) : (

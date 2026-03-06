@@ -361,9 +361,9 @@ function HeaderUserMenu({ config, notifications }) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
   if (!isReady || !user) return null;
-  user.provider && user.provider !== "email";
+  const isOAuthUser = user.provider && user.provider !== "email";
   const initials = user.name ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase() : (user.email?.[0] ?? "?").toUpperCase();
-  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-3", children: [
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-4", children: [
     /* @__PURE__ */ jsxRuntime.jsx(
       NotificationBell,
       {
@@ -384,16 +384,41 @@ function HeaderUserMenu({ config, notifications }) {
           ]
         }
       ),
-      isOpen && /* Correção: Background sólido e z-index alto para evitar transparência */
-      /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute right-0 top-full z-[100] mt-2 w-64 rounded-xl border border-white/10 bg-[#1e2536] p-1.5 shadow-2xl", children: [
+      isOpen && /* Correção de Background sólido e Z-index para evitar transparência */
+      /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute right-0 top-full z-[100] mt-2 w-64 rounded-xl border border-white/10 bg-[#1e2536] p-1.5 shadow-2xl animate-in fade-in zoom-in-95 duration-200", children: [
         /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "px-3 py-3 border-b border-white/5", children: [
           /* @__PURE__ */ jsxRuntime.jsx("p", { className: "truncate text-sm font-semibold text-white", children: user.name }),
           /* @__PURE__ */ jsxRuntime.jsx("p", { className: "truncate text-[11px] text-white/40", children: user.email })
         ] }),
-        /* @__PURE__ */ jsxRuntime.jsx("div", { className: "py-1", children: /* @__PURE__ */ jsxRuntime.jsxs("button", { onClick: logout, className: "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 transition-colors", children: [
-          /* @__PURE__ */ jsxRuntime.jsx(lucideReact.LogOut, { className: "h-4 w-4" }),
-          " Sair da conta"
-        ] }) })
+        /* @__PURE__ */ jsxRuntime.jsx("div", { className: "py-1 border-b border-white/5", children: /* @__PURE__ */ jsxRuntime.jsxs("a", { href: getAppUrl("/dashboard"), className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5 transition-colors", children: [
+          /* @__PURE__ */ jsxRuntime.jsx(lucideReact.LayoutDashboard, { className: "h-4 w-4 opacity-50" }),
+          " Painel Principal"
+        ] }) }),
+        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "py-1 border-b border-white/5", children: [
+          /* @__PURE__ */ jsxRuntime.jsx("div", { className: "px-3 py-1.5 text-[10px] font-bold text-white/20 uppercase tracking-wider", children: "Configura\xE7\xF5es" }),
+          /* @__PURE__ */ jsxRuntime.jsxs("a", { href: getAppUrl("/settings/profile"), className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5", children: [
+            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Settings, { className: "h-4 w-4 opacity-50" }),
+            " Editar Perfil"
+          ] }),
+          !isOAuthUser && /* @__PURE__ */ jsxRuntime.jsxs("a", { href: getAppUrl("/settings/security"), className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5", children: [
+            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Lock, { className: "h-4 w-4 opacity-50" }),
+            " Seguran\xE7a"
+          ] }),
+          isOAuthUser && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "px-3 py-2 text-[10px] font-bold uppercase text-white/10", children: [
+            "via ",
+            user.provider
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "py-1", children: [
+          /* @__PURE__ */ jsxRuntime.jsxs("a", { href: config.docsUrl || "https://docs.easygoal.com.br", target: "_blank", className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5", children: [
+            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.BookOpen, { className: "h-4 w-4 opacity-50" }),
+            " Documenta\xE7\xE3o"
+          ] }),
+          /* @__PURE__ */ jsxRuntime.jsxs("button", { onClick: logout, className: "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 transition-colors", children: [
+            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.LogOut, { className: "h-4 w-4" }),
+            " Sair da conta"
+          ] })
+        ] })
       ] })
     ] })
   ] });
