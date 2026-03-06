@@ -5,7 +5,6 @@ import {
   BookOpen,
   ChevronDown,
   LayoutDashboard,
-  Lock,
   LogOut,
   Settings
 } from "lucide-react";
@@ -43,99 +42,58 @@ function HeaderUserMenu({ config, notifications }: {
   const { logout } = useSSOLogin({
     ssoUrl: config.ssoUrl,
     apiKey: config.apiKey,
-    logoutPath: "/api/auth/signout",
   });
 
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Helper para garantir links absolutos para o App Principal (Easy Goal Admin/Dashboard)
+  // Helper para links absolutos
   const getAppUrl = (path: string) => {
     const baseUrl = config.appUrl || "https://app.easygoal.com.br";
     return `${baseUrl}${path}`;
   };
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setIsOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
   if (!isReady || !user) return null;
-
-  const isOAuthUser = user.provider && user.provider !== "email";
-  const initials = user.name
-    ? user.name.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()
-    : (user.email?.[0] ?? "?").toUpperCase();
 
   return (
     <div className="flex items-center gap-4">
-      {/* Sino de Notificação Global ao lado do perfil */}
+      {/* Notificações Globais */}
       <NotificationBell
         notifications={notifications}
         allNotificationsUrl={getAppUrl("/notifications")}
       />
 
       <div ref={containerRef} className="relative">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-white/5"
-        >
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500/10 border border-orange-500/20 overflow-hidden shrink-0">
-            {user.avatarUrl ? (
-              <img src={user.avatarUrl} className="h-full w-full object-cover" alt="" />
-            ) : (
-              <span className="text-[10px] font-bold text-orange-500">{initials}</span>
-            )}
+        <button onClick={() => setIsOpen(!isOpen)} className="flex items-center gap-2 px-2 py-1.5 transition-colors hover:bg-white/5 rounded-lg">
+          <div className="h-8 w-8 rounded-full border border-orange-500/20 bg-orange-500/10 overflow-hidden shrink-0">
+            <img src={user.avatarUrl ?? ""} className="h-full w-full object-cover" alt="" />
           </div>
-          <span className="hidden max-w-[100px] truncate font-medium sm:block text-white/90">
-            {user.name?.split(" ")[0]}
-          </span>
-          <ChevronDown className={`h-4 w-4 text-white/30 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <span className="hidden sm:block text-white/90 text-sm font-medium">{user.name?.split(" ")[0]}</span>
+          <ChevronDown className="h-4 w-4 text-white/30" />
         </button>
 
         {isOpen && (
-          /* Correção de Background sólido e Z-index para evitar transparência */
-          <div className="absolute right-0 top-full z-[100] mt-2 w-64 rounded-xl border border-white/10 bg-[#1e2536] p-1.5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            {/* Identidade */}
+          /* CORREÇÃO DE TRANSPARÊNCIA: Adicionado bg sólido e shadow pesado */
+          <div className="absolute right-0 top-full z-[100] mt-2 w-64 rounded-xl border border-white/10 bg-[#1e2536] p-1.5 shadow-[0_10px_40px_rgba(0,0,0,0.7)]">
             <div className="px-3 py-3 border-b border-white/5">
               <p className="truncate text-sm font-semibold text-white">{user.name}</p>
               <p className="truncate text-[11px] text-white/40">{user.email}</p>
             </div>
 
-            {/* Navegação de Ecossistema - Centralizada */}
-            <div className="py-1 border-b border-white/5">
-              <a href={getAppUrl("/dashboard")} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5 transition-colors">
+            <div className="py-1">
+              <a href={getAppUrl("/dashboard")} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5">
                 <LayoutDashboard className="h-4 w-4 opacity-50" /> Painel Principal
               </a>
-            </div>
-
-            {/* Configurações Centrais */}
-            <div className="py-1 border-b border-white/5">
-              <div className="px-3 py-1.5 text-[10px] font-bold text-white/20 uppercase tracking-wider">
-                Configurações
-              </div>
               <a href={getAppUrl("/settings/profile")} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5">
                 <Settings className="h-4 w-4 opacity-50" /> Editar Perfil
               </a>
-              {!isOAuthUser && (
-                <a href={getAppUrl("/settings/security")} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5">
-                  <Lock className="h-4 w-4 opacity-50" /> Segurança
-                </a>
-              )}
-              {isOAuthUser && (
-                <div className="px-3 py-2 text-[10px] font-bold uppercase text-white/10">via {user.provider}</div>
-              )}
-            </div>
-
-            {/* Ajuda e Sair */}
-            <div className="py-1">
               <a href={config.docsUrl || "https://docs.easygoal.com.br"} target="_blank" className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5">
                 <BookOpen className="h-4 w-4 opacity-50" /> Documentação
               </a>
-              <button onClick={logout} className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 transition-colors">
+            </div>
+
+            <div className="border-t border-white/5 pt-1">
+              <button onClick={logout} className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-red-400 hover:bg-red-400/10">
                 <LogOut className="h-4 w-4" /> Sair da conta
               </button>
             </div>
@@ -145,7 +103,6 @@ function HeaderUserMenu({ config, notifications }: {
     </div>
   );
 }
-
 // --- Componente Principal EasyHeader ---
 export function EasyHeader({
   logoSuffix,

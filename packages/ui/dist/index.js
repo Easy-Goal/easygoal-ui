@@ -344,8 +344,7 @@ function HeaderUserMenu({ config, notifications }) {
   const { user, isReady } = client.useEgSession();
   const { logout } = client.useSSOLogin({
     ssoUrl: config.ssoUrl,
-    apiKey: config.apiKey,
-    logoutPath: "/api/auth/signout"
+    apiKey: config.apiKey
   });
   const [isOpen, setIsOpen] = react.useState(false);
   const containerRef = react.useRef(null);
@@ -353,16 +352,7 @@ function HeaderUserMenu({ config, notifications }) {
     const baseUrl = config.appUrl || "https://app.easygoal.com.br";
     return `${baseUrl}${path}`;
   };
-  react.useEffect(() => {
-    const handler = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) setIsOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
   if (!isReady || !user) return null;
-  const isOAuthUser = user.provider && user.provider !== "email";
-  const initials = user.name ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase() : (user.email?.[0] ?? "?").toUpperCase();
   return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-4", children: [
     /* @__PURE__ */ jsxRuntime.jsx(
       NotificationBell,
@@ -372,53 +362,35 @@ function HeaderUserMenu({ config, notifications }) {
       }
     ),
     /* @__PURE__ */ jsxRuntime.jsxs("div", { ref: containerRef, className: "relative", children: [
-      /* @__PURE__ */ jsxRuntime.jsxs(
-        "button",
-        {
-          onClick: () => setIsOpen(!isOpen),
-          className: "flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-white/5",
-          children: [
-            /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex h-8 w-8 items-center justify-center rounded-full bg-orange-500/10 border border-orange-500/20 overflow-hidden shrink-0", children: user.avatarUrl ? /* @__PURE__ */ jsxRuntime.jsx("img", { src: user.avatarUrl, className: "h-full w-full object-cover", alt: "" }) : /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] font-bold text-orange-500", children: initials }) }),
-            /* @__PURE__ */ jsxRuntime.jsx("span", { className: "hidden max-w-[100px] truncate font-medium sm:block text-white/90", children: user.name?.split(" ")[0] }),
-            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.ChevronDown, { className: `h-4 w-4 text-white/30 transition-transform ${isOpen ? "rotate-180" : ""}` })
-          ]
-        }
-      ),
-      isOpen && /* Correção de Background sólido e Z-index para evitar transparência */
-      /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute right-0 top-full z-[100] mt-2 w-64 rounded-xl border border-white/10 bg-[#1e2536] p-1.5 shadow-2xl animate-in fade-in zoom-in-95 duration-200", children: [
+      /* @__PURE__ */ jsxRuntime.jsxs("button", { onClick: () => setIsOpen(!isOpen), className: "flex items-center gap-2 px-2 py-1.5 transition-colors hover:bg-white/5 rounded-lg", children: [
+        /* @__PURE__ */ jsxRuntime.jsx("div", { className: "h-8 w-8 rounded-full border border-orange-500/20 bg-orange-500/10 overflow-hidden shrink-0", children: /* @__PURE__ */ jsxRuntime.jsx("img", { src: user.avatarUrl ?? "", className: "h-full w-full object-cover", alt: "" }) }),
+        /* @__PURE__ */ jsxRuntime.jsx("span", { className: "hidden sm:block text-white/90 text-sm font-medium", children: user.name?.split(" ")[0] }),
+        /* @__PURE__ */ jsxRuntime.jsx(lucideReact.ChevronDown, { className: "h-4 w-4 text-white/30" })
+      ] }),
+      isOpen && /* CORREÇÃO DE TRANSPARÊNCIA: Adicionado bg sólido e shadow pesado */
+      /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute right-0 top-full z-[100] mt-2 w-64 rounded-xl border border-white/10 bg-[#1e2536] p-1.5 shadow-[0_10px_40px_rgba(0,0,0,0.7)]", children: [
         /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "px-3 py-3 border-b border-white/5", children: [
           /* @__PURE__ */ jsxRuntime.jsx("p", { className: "truncate text-sm font-semibold text-white", children: user.name }),
           /* @__PURE__ */ jsxRuntime.jsx("p", { className: "truncate text-[11px] text-white/40", children: user.email })
         ] }),
-        /* @__PURE__ */ jsxRuntime.jsx("div", { className: "py-1 border-b border-white/5", children: /* @__PURE__ */ jsxRuntime.jsxs("a", { href: getAppUrl("/dashboard"), className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5 transition-colors", children: [
-          /* @__PURE__ */ jsxRuntime.jsx(lucideReact.LayoutDashboard, { className: "h-4 w-4 opacity-50" }),
-          " Painel Principal"
-        ] }) }),
-        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "py-1 border-b border-white/5", children: [
-          /* @__PURE__ */ jsxRuntime.jsx("div", { className: "px-3 py-1.5 text-[10px] font-bold text-white/20 uppercase tracking-wider", children: "Configura\xE7\xF5es" }),
+        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "py-1", children: [
+          /* @__PURE__ */ jsxRuntime.jsxs("a", { href: getAppUrl("/dashboard"), className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5", children: [
+            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.LayoutDashboard, { className: "h-4 w-4 opacity-50" }),
+            " Painel Principal"
+          ] }),
           /* @__PURE__ */ jsxRuntime.jsxs("a", { href: getAppUrl("/settings/profile"), className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5", children: [
             /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Settings, { className: "h-4 w-4 opacity-50" }),
             " Editar Perfil"
           ] }),
-          !isOAuthUser && /* @__PURE__ */ jsxRuntime.jsxs("a", { href: getAppUrl("/settings/security"), className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5", children: [
-            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Lock, { className: "h-4 w-4 opacity-50" }),
-            " Seguran\xE7a"
-          ] }),
-          isOAuthUser && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "px-3 py-2 text-[10px] font-bold uppercase text-white/10", children: [
-            "via ",
-            user.provider
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "py-1", children: [
           /* @__PURE__ */ jsxRuntime.jsxs("a", { href: config.docsUrl || "https://docs.easygoal.com.br", target: "_blank", className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5", children: [
             /* @__PURE__ */ jsxRuntime.jsx(lucideReact.BookOpen, { className: "h-4 w-4 opacity-50" }),
             " Documenta\xE7\xE3o"
-          ] }),
-          /* @__PURE__ */ jsxRuntime.jsxs("button", { onClick: logout, className: "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 transition-colors", children: [
-            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.LogOut, { className: "h-4 w-4" }),
-            " Sair da conta"
           ] })
-        ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntime.jsx("div", { className: "border-t border-white/5 pt-1", children: /* @__PURE__ */ jsxRuntime.jsxs("button", { onClick: logout, className: "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-red-400 hover:bg-red-400/10", children: [
+          /* @__PURE__ */ jsxRuntime.jsx(lucideReact.LogOut, { className: "h-4 w-4" }),
+          " Sair da conta"
+        ] }) })
       ] })
     ] })
   ] });
