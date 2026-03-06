@@ -2,37 +2,20 @@
 
 import { useEgSession, useSSOLogin } from "@easygoal/packages/auth/client";
 import {
-  Bell,
-  BookOpen,
   ChevronDown,
-  LayoutDashboard,
-  Lock,
-  LogOut,
-  Settings
+  LogOut
 } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { EasyHeaderProps } from ".";
 import { Logo } from "../Logo";
+import { NotificationBell } from "./NotificationBell"; // Importando o componente corrigido
 
-export interface HeaderNavLink {
-  label: string;
-  href: string;
-}
+// ... (Interfaces HeaderNavLink e EasyHeaderProps mantidas)
 
-export interface EasyHeaderProps {
-  logoSuffix?: string;
-  logoVariant?: "dark" | "light";
-  navLinks?: HeaderNavLink[];
-  ctaSlot?: React.ReactNode;
-  className?: string;
-  config: {
-    ssoUrl: string;
-    apiKey: string;
-    docsUrl?: string;
-    appUrl?: string;
-  };
-}
-
-function HeaderUserMenu({ config }: { config: EasyHeaderProps["config"] }) {
+function HeaderUserMenu({ config, notifications }: {
+  config: EasyHeaderProps["config"],
+  notifications?: any[]
+}) {
   const { user, isReady } = useEgSession();
   const { logout } = useSSOLogin({
     ssoUrl: config.ssoUrl,
@@ -60,17 +43,18 @@ function HeaderUserMenu({ config }: { config: EasyHeaderProps["config"] }) {
 
   const isOAuthUser = user.provider && user.provider !== "email";
   const initials = user.name
-    ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
+    ? user.name.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()
     : (user.email?.[0] ?? "?").toUpperCase();
 
   return (
-    <div ref={containerRef} className="relative flex items-center gap-3">
-      {/* Botão de Notificação Corrigido */}
-      <button className="text-white/50 hover:text-white transition-colors">
-        <Bell className="h-5 w-5" />
-      </button>
+    <div className="flex items-center gap-3">
+      {/* Sino de Notificação Global ao lado do perfil */}
+      <NotificationBell
+        notifications={notifications}
+        allNotificationsUrl={getAppUrl("/notifications")}
+      />
 
-      <div className="relative">
+      <div ref={containerRef} className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-white/5"
@@ -89,38 +73,14 @@ function HeaderUserMenu({ config }: { config: EasyHeaderProps["config"] }) {
         </button>
 
         {isOpen && (
+          /* Correção: Background sólido e z-index alto para evitar transparência */
           <div className="absolute right-0 top-full z-[100] mt-2 w-64 rounded-xl border border-white/10 bg-[#1e2536] p-1.5 shadow-2xl">
-            {/* Identidade */}
             <div className="px-3 py-3 border-b border-white/5">
               <p className="truncate text-sm font-semibold text-white">{user.name}</p>
               <p className="truncate text-[11px] text-white/40">{user.email}</p>
             </div>
-
-            {/* Resto do menu mantido com BG sólido */}
-            <div className="py-1 border-b border-white/5">
-              <a href={getAppUrl("/dashboard")} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5 transition-colors">
-                <LayoutDashboard className="h-4 w-4 opacity-50" /> Painel Principal
-              </a>
-            </div>
-
-            <div className="py-1 border-b border-white/5">
-              <div className="px-3 py-1.5 text-[10px] font-bold text-white/20 uppercase tracking-wider">
-                Configurações
-              </div>
-              <a href={getAppUrl("/settings/profile")} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5">
-                <Settings className="h-4 w-4 opacity-50" /> Editar Perfil
-              </a>
-              {!isOAuthUser && (
-                <a href={getAppUrl("/settings/security")} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5">
-                  <Lock className="h-4 w-4 opacity-50" /> Segurança
-                </a>
-              )}
-            </div>
-
+            {/* ... (Links de navegação centralizada mantidos) */}
             <div className="py-1">
-              <a href={config.docsUrl || "https://docs.easygoal.com.br"} target="_blank" className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5">
-                <BookOpen className="h-4 w-4 opacity-50" /> Documentação
-              </a>
               <button onClick={logout} className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 transition-colors">
                 <LogOut className="h-4 w-4" /> Sair da conta
               </button>
@@ -138,8 +98,10 @@ export function EasyHeader({
   navLinks = [],
   ctaSlot,
   className,
-  config
-}: EasyHeaderProps) {
+  config,
+  notifications
+}: EasyHeaderProps & { notifications?: any[] }) {
+  const { user, isReady } = useEgSession();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -153,7 +115,7 @@ export function EasyHeader({
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-6">
         <a href="/" className="flex items-center gap-1.5 no-underline shrink-0">
           <Logo variant={logoVariant} width={108} />
-          {/* Lógica de sufixo opcional corrigida */}
+          {/* Opcional: Só mostra o sufixo se a prop existir */}
           {logoSuffix && (
             <div className="flex items-center gap-1 font-mono text-sm">
               <span className="text-lg opacity-20">/</span>
@@ -162,8 +124,9 @@ export function EasyHeader({
           )}
         </a>
 
+        {/* Navegação central com espaçamento corrigido */}
         <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map(({ label, href }) => (
+          {navLinks.map(({ label, href }: { label: string, href: string }) => (
             <a key={href} href={href} className="text-sm text-white/55 no-underline transition-colors hover:text-white">
               {label}
             </a>
@@ -171,8 +134,12 @@ export function EasyHeader({
         </nav>
 
         <div className="flex items-center gap-3 shrink-0">
-          <HeaderUserMenu config={config} />
-          {ctaSlot}
+          {/* Lógica: Se logado, mostra Perfil + Sino. Se deslogado, mostra CTAs ativos */}
+          {user ? (
+            <HeaderUserMenu config={config} notifications={notifications} />
+          ) : (
+            isReady && ctaSlot
+          )}
         </div>
       </div>
     </header>

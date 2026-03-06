@@ -86,7 +86,261 @@ function Logo({ variant = "dark", width = 133, className }) {
     }
   );
 }
-function HeaderUserMenu({ config }) {
+function formatTimeAgo(dateString) {
+  const diff = Date.now() - new Date(dateString).getTime();
+  const mins = Math.floor(diff / 6e4);
+  const hours = Math.floor(diff / 36e5);
+  const days = Math.floor(diff / 864e5);
+  if (mins < 1) return "Agora";
+  if (mins < 60) return `${mins}min`;
+  if (hours < 24) return `${hours}h`;
+  if (days < 7) return `${days}d`;
+  return new Date(dateString).toLocaleDateString("pt-BR");
+}
+var S = {
+  wrap: {
+    position: "relative"
+  },
+  btn: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    border: "none",
+    background: "transparent",
+    cursor: "pointer",
+    color: "inherit",
+    padding: 0
+  },
+  badge: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: "#ef4444",
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: 700,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "0 4px",
+    lineHeight: 1
+  },
+  dropdown: {
+    position: "absolute",
+    right: 0,
+    top: "calc(100% + 8px)",
+    width: 320,
+    borderRadius: 10,
+    border: "1px solid rgba(255,255,255,0.1)",
+    backgroundColor: "hsl(220 45% 17%)",
+    boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+    zIndex: 100,
+    overflow: "hidden"
+  },
+  dropdownHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "12px 16px",
+    borderBottom: "1px solid rgba(255,255,255,0.08)"
+  },
+  dropdownTitle: {
+    fontSize: 14,
+    fontWeight: 600,
+    margin: 0,
+    color: "hsl(0 0% 100%)"
+  },
+  markAllBtn: {
+    fontSize: 11,
+    color: "hsl(18 100% 62%)",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    padding: 0
+  },
+  list: {
+    maxHeight: 360,
+    overflowY: "auto"
+  },
+  empty: {
+    padding: "24px 16px",
+    textAlign: "center",
+    fontSize: 13,
+    color: "rgba(255,255,255,0.4)"
+  },
+  item: (isUnread) => ({
+    display: "flex",
+    alignItems: "flex-start",
+    gap: 10,
+    padding: "10px 16px",
+    borderBottom: "1px solid rgba(255,255,255,0.05)",
+    backgroundColor: isUnread ? "rgba(249,115,22,0.06)" : "transparent",
+    cursor: "pointer",
+    textDecoration: "none"
+  }),
+  dot: {
+    width: 7,
+    height: 7,
+    borderRadius: "50%",
+    backgroundColor: "hsl(18 100% 62%)",
+    flexShrink: 0,
+    marginTop: 5
+  },
+  itemContent: {
+    flex: 1,
+    minWidth: 0
+  },
+  itemTitle: (isUnread) => ({
+    fontSize: 13,
+    fontWeight: isUnread ? 600 : 400,
+    color: "hsl(0 0% 100%)",
+    margin: 0,
+    lineHeight: 1.4
+  }),
+  itemMsg: {
+    fontSize: 12,
+    color: "rgba(255,255,255,0.5)",
+    margin: "2px 0 0",
+    lineHeight: 1.4,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden"
+  },
+  itemTime: {
+    fontSize: 11,
+    color: "rgba(255,255,255,0.35)",
+    margin: "3px 0 0"
+  },
+  actions: {
+    display: "flex",
+    gap: 2,
+    flexShrink: 0,
+    marginTop: 1
+  },
+  actionBtn: {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    padding: 3,
+    borderRadius: 4,
+    color: "rgba(255,255,255,0.35)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  footer: {
+    padding: "8px 16px",
+    borderTop: "1px solid rgba(255,255,255,0.08)",
+    textAlign: "center"
+  },
+  footerLink: {
+    fontSize: 12,
+    color: "rgba(255,255,255,0.5)",
+    textDecoration: "none"
+  }
+};
+var BellIcon = () => /* @__PURE__ */ jsxRuntime.jsxs("svg", { width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+  /* @__PURE__ */ jsxRuntime.jsx("path", { d: "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" }),
+  /* @__PURE__ */ jsxRuntime.jsx("path", { d: "M13.73 21a2 2 0 0 1-3.46 0" })
+] });
+var CheckIcon = () => /* @__PURE__ */ jsxRuntime.jsx("svg", { width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: /* @__PURE__ */ jsxRuntime.jsx("polyline", { points: "20 6 9 17 4 12" }) });
+var TrashIcon = () => /* @__PURE__ */ jsxRuntime.jsxs("svg", { width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [
+  /* @__PURE__ */ jsxRuntime.jsx("polyline", { points: "3 6 5 6 21 6" }),
+  /* @__PURE__ */ jsxRuntime.jsx("path", { d: "M19 6l-1 14H6L5 6" }),
+  /* @__PURE__ */ jsxRuntime.jsx("path", { d: "M10 11v6M14 11v6" }),
+  /* @__PURE__ */ jsxRuntime.jsx("path", { d: "M9 6V4h6v2" })
+] });
+function NotificationBell({
+  notifications = [],
+  onMarkRead,
+  onMarkAllRead,
+  onDelete,
+  allNotificationsUrl
+}) {
+  const [isOpen, setIsOpen] = react.useState(false);
+  const ref = react.useRef(null);
+  const unread = notifications.filter((n) => !n.readAt);
+  const unreadCount = unread.length;
+  react.useEffect(() => {
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setIsOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { style: S.wrap, ref, children: [
+    /* @__PURE__ */ jsxRuntime.jsxs(
+      "button",
+      {
+        style: S.btn,
+        onClick: () => setIsOpen((o) => !o),
+        "aria-label": `Notifica\xE7\xF5es${unreadCount > 0 ? ` (${unreadCount} n\xE3o lidas)` : ""}`,
+        children: [
+          /* @__PURE__ */ jsxRuntime.jsx(BellIcon, {}),
+          unreadCount > 0 && /* @__PURE__ */ jsxRuntime.jsx("span", { style: S.badge, children: unreadCount > 9 ? "9+" : unreadCount })
+        ]
+      }
+    ),
+    isOpen && /* @__PURE__ */ jsxRuntime.jsxs("div", { style: S.dropdown, children: [
+      /* @__PURE__ */ jsxRuntime.jsxs("div", { style: S.dropdownHeader, children: [
+        /* @__PURE__ */ jsxRuntime.jsx("p", { style: S.dropdownTitle, children: "Notifica\xE7\xF5es" }),
+        unreadCount > 0 && onMarkAllRead && /* @__PURE__ */ jsxRuntime.jsx("button", { style: S.markAllBtn, onClick: () => onMarkAllRead(), children: "Marcar todas como lidas" })
+      ] }),
+      /* @__PURE__ */ jsxRuntime.jsx("div", { style: S.list, children: notifications.length === 0 ? /* @__PURE__ */ jsxRuntime.jsx("p", { style: S.empty, children: "Nenhuma notifica\xE7\xE3o" }) : notifications.slice(0, 10).map((n) => {
+        const isUnread = !n.readAt;
+        const inner = /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+          isUnread && /* @__PURE__ */ jsxRuntime.jsx("span", { style: S.dot }),
+          /* @__PURE__ */ jsxRuntime.jsxs("div", { style: S.itemContent, children: [
+            /* @__PURE__ */ jsxRuntime.jsx("p", { style: S.itemTitle(isUnread), children: n.title }),
+            /* @__PURE__ */ jsxRuntime.jsx("p", { style: S.itemMsg, children: n.message }),
+            /* @__PURE__ */ jsxRuntime.jsx("p", { style: S.itemTime, children: formatTimeAgo(n.createdAt) })
+          ] }),
+          /* @__PURE__ */ jsxRuntime.jsxs("div", { style: S.actions, children: [
+            isUnread && onMarkRead && /* @__PURE__ */ jsxRuntime.jsx(
+              "button",
+              {
+                style: S.actionBtn,
+                title: "Marcar como lida",
+                onClick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onMarkRead(n.id);
+                },
+                children: /* @__PURE__ */ jsxRuntime.jsx(CheckIcon, {})
+              }
+            ),
+            onDelete && /* @__PURE__ */ jsxRuntime.jsx(
+              "button",
+              {
+                style: S.actionBtn,
+                title: "Remover",
+                onClick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onDelete(n.id);
+                },
+                children: /* @__PURE__ */ jsxRuntime.jsx(TrashIcon, {})
+              }
+            )
+          ] })
+        ] });
+        return n.actionUrl ? /* @__PURE__ */ jsxRuntime.jsx("a", { href: n.actionUrl, style: S.item(isUnread), onClick: () => setIsOpen(false), children: inner }, n.id) : /* @__PURE__ */ jsxRuntime.jsx("div", { style: S.item(isUnread), onClick: () => {
+          if (isUnread && onMarkRead) onMarkRead(n.id);
+        }, children: inner }, n.id);
+      }) }),
+      allNotificationsUrl && notifications.length > 10 && /* @__PURE__ */ jsxRuntime.jsx("div", { style: S.footer, children: /* @__PURE__ */ jsxRuntime.jsx("a", { href: allNotificationsUrl, style: S.footerLink, onClick: () => setIsOpen(false), children: "Ver todas as notifica\xE7\xF5es" }) })
+    ] })
+  ] });
+}
+function HeaderUserMenu({ config, notifications }) {
   const { user, isReady } = client.useEgSession();
   const { logout } = client.useSSOLogin({
     ssoUrl: config.ssoUrl,
@@ -107,11 +361,17 @@ function HeaderUserMenu({ config }) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
   if (!isReady || !user) return null;
-  const isOAuthUser = user.provider && user.provider !== "email";
+  user.provider && user.provider !== "email";
   const initials = user.name ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase() : (user.email?.[0] ?? "?").toUpperCase();
-  return /* @__PURE__ */ jsxRuntime.jsxs("div", { ref: containerRef, className: "relative flex items-center gap-3", children: [
-    /* @__PURE__ */ jsxRuntime.jsx("button", { className: "text-white/50 hover:text-white transition-colors", children: /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Bell, { className: "h-5 w-5" }) }),
-    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative", children: [
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-3", children: [
+    /* @__PURE__ */ jsxRuntime.jsx(
+      NotificationBell,
+      {
+        notifications,
+        allNotificationsUrl: getAppUrl("/notifications")
+      }
+    ),
+    /* @__PURE__ */ jsxRuntime.jsxs("div", { ref: containerRef, className: "relative", children: [
       /* @__PURE__ */ jsxRuntime.jsxs(
         "button",
         {
@@ -124,36 +384,16 @@ function HeaderUserMenu({ config }) {
           ]
         }
       ),
-      isOpen && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute right-0 top-full z-[100] mt-2 w-64 rounded-xl border border-white/10 bg-[#1e2536] p-1.5 shadow-2xl", children: [
+      isOpen && /* Correção: Background sólido e z-index alto para evitar transparência */
+      /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute right-0 top-full z-[100] mt-2 w-64 rounded-xl border border-white/10 bg-[#1e2536] p-1.5 shadow-2xl", children: [
         /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "px-3 py-3 border-b border-white/5", children: [
           /* @__PURE__ */ jsxRuntime.jsx("p", { className: "truncate text-sm font-semibold text-white", children: user.name }),
           /* @__PURE__ */ jsxRuntime.jsx("p", { className: "truncate text-[11px] text-white/40", children: user.email })
         ] }),
-        /* @__PURE__ */ jsxRuntime.jsx("div", { className: "py-1 border-b border-white/5", children: /* @__PURE__ */ jsxRuntime.jsxs("a", { href: getAppUrl("/dashboard"), className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5 transition-colors", children: [
-          /* @__PURE__ */ jsxRuntime.jsx(lucideReact.LayoutDashboard, { className: "h-4 w-4 opacity-50" }),
-          " Painel Principal"
-        ] }) }),
-        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "py-1 border-b border-white/5", children: [
-          /* @__PURE__ */ jsxRuntime.jsx("div", { className: "px-3 py-1.5 text-[10px] font-bold text-white/20 uppercase tracking-wider", children: "Configura\xE7\xF5es" }),
-          /* @__PURE__ */ jsxRuntime.jsxs("a", { href: getAppUrl("/settings/profile"), className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5", children: [
-            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Settings, { className: "h-4 w-4 opacity-50" }),
-            " Editar Perfil"
-          ] }),
-          !isOAuthUser && /* @__PURE__ */ jsxRuntime.jsxs("a", { href: getAppUrl("/settings/security"), className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5", children: [
-            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.Lock, { className: "h-4 w-4 opacity-50" }),
-            " Seguran\xE7a"
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "py-1", children: [
-          /* @__PURE__ */ jsxRuntime.jsxs("a", { href: config.docsUrl || "https://docs.easygoal.com.br", target: "_blank", className: "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5", children: [
-            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.BookOpen, { className: "h-4 w-4 opacity-50" }),
-            " Documenta\xE7\xE3o"
-          ] }),
-          /* @__PURE__ */ jsxRuntime.jsxs("button", { onClick: logout, className: "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 transition-colors", children: [
-            /* @__PURE__ */ jsxRuntime.jsx(lucideReact.LogOut, { className: "h-4 w-4" }),
-            " Sair da conta"
-          ] })
-        ] })
+        /* @__PURE__ */ jsxRuntime.jsx("div", { className: "py-1", children: /* @__PURE__ */ jsxRuntime.jsxs("button", { onClick: logout, className: "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 transition-colors", children: [
+          /* @__PURE__ */ jsxRuntime.jsx(lucideReact.LogOut, { className: "h-4 w-4" }),
+          " Sair da conta"
+        ] }) })
       ] })
     ] })
   ] });
@@ -164,8 +404,10 @@ function EasyHeader({
   navLinks = [],
   ctaSlot,
   className,
-  config
+  config,
+  notifications
 }) {
+  const { user, isReady } = client.useEgSession();
   const [scrolled, setScrolled] = react.useState(false);
   react.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -181,10 +423,7 @@ function EasyHeader({
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntime.jsx("nav", { className: "hidden items-center gap-8 md:flex", children: navLinks.map(({ label, href }) => /* @__PURE__ */ jsxRuntime.jsx("a", { href, className: "text-sm text-white/55 no-underline transition-colors hover:text-white", children: label }, href)) }),
-    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-3 shrink-0", children: [
-      /* @__PURE__ */ jsxRuntime.jsx(HeaderUserMenu, { config }),
-      ctaSlot
-    ] })
+    /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex items-center gap-3 shrink-0", children: user ? /* @__PURE__ */ jsxRuntime.jsx(HeaderUserMenu, { config, notifications }) : isReady && ctaSlot })
   ] }) });
 }
 var RANK_CONFIG = {
