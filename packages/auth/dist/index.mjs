@@ -86,39 +86,44 @@ function useEgSession() {
 }
 function EgSessionProvider({ children, config }) {
   const {
-    sessionPath = "/api/auth/session",
-    ssoUrl,
-    apiKey
+    sessionPath = "/api/auth/session"
   } = config ?? {};
   const [state, setState] = useState2({
     user: null,
     isReady: false
   });
   useEffect2(() => {
+    let isMounted = true;
     fetch(sessionPath).then(async (res) => {
-      if (res.status === 401 && ssoUrl) {
-        const url = new URL(`${ssoUrl}/auth/login`);
-        if (apiKey) {
-          url.searchParams.set("api_key", apiKey);
-        }
-        url.searchParams.set("redirect_to", window.location.href);
-        window.location.href = url.toString();
+      if (!res.ok) {
         return null;
       }
       return res.json();
     }).then((data) => {
-      if (data) {
+      if (!isMounted) return;
+      if (data && !data.error) {
         const claimsToMap = data.claims || data;
         setState({
           user: mapClaims(claimsToMap),
           isReady: true
+          // Libera a UI
+        });
+      } else {
+        setState({
+          user: null,
+          isReady: true
+          // Libera a UI para mostrar os botões "Entrar"
         });
       }
     }).catch((err) => {
+      if (!isMounted) return;
       console.error("Erro ao carregar sess\xE3o:", err);
-      setState((prev) => ({ ...prev, isReady: true }));
+      setState({ user: null, isReady: true });
     });
-  }, [sessionPath, ssoUrl, apiKey]);
+    return () => {
+      isMounted = false;
+    };
+  }, [sessionPath]);
   return /* @__PURE__ */ jsx2(EgSessionContext.Provider, { value: state, children });
 }
 function mapClaims(claims) {
@@ -132,7 +137,6 @@ function mapClaims(claims) {
     rankName: claims.rank_name ?? null,
     planSlug: claims.plan_slug ?? null,
     provider: claims.provider ?? void 0
-    // <-- Injetando o provider pro comparativo OAuth
   };
 }
 

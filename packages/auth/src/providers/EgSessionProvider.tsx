@@ -67,8 +67,6 @@ interface EgSessionProviderProps {
 export function EgSessionProvider({ children, config }: EgSessionProviderProps) {
   const {
     sessionPath = '/api/auth/session',
-    ssoUrl,
-    apiKey
   } = config ?? {};
 
   const [state, setState] = useState<EgSessionContextValue>({
@@ -77,36 +75,46 @@ export function EgSessionProvider({ children, config }: EgSessionProviderProps) 
   });
 
   useEffect(() => {
+    let isMounted = true; // Evita memory leaks se o componente desmontar rápido
+
     fetch(sessionPath)
       .then(async (res) => {
-        if (res.status === 401 && ssoUrl) {
-          const url = new URL(`${ssoUrl}/auth/login`);
-          if (apiKey) {
-            url.searchParams.set("api_key", apiKey);
-          }
-          url.searchParams.set("redirect_to", window.location.href);
-          window.location.href = url.toString();
+        // Se a resposta for 401 ou qualquer erro, apenas retornamos null (sem redirecionar à força)
+        if (!res.ok) {
           return null;
         }
         return res.json();
       })
       .then((data) => {
-        // CORREÇÃO: Atualiza o state chamando o mapClaims!
-        if (data) {
-          // Ajuste "data.user" ou "data.claims" dependendo de como sua API de session retorna
-          const claimsToMap = data.claims || data;
+        if (!isMounted) return;
 
+        if (data && !data.error) {
+          // USUÁRIO LOGADO
+          const claimsToMap = data.claims || data;
           setState({
             user: mapClaims(claimsToMap),
-            isReady: true,
+            isReady: true, // Libera a UI
+          });
+        } else {
+          // USUÁRIO DESLOGADO (A MÁGICA ACONTECE AQUI!)
+          // Agora avisamos a UI que carregou, mas que não tem ninguém logado.
+          setState({
+            user: null,
+            isReady: true, // Libera a UI para mostrar os botões "Entrar"
           });
         }
       })
       .catch((err) => {
+        if (!isMounted) return;
         console.error("Erro ao carregar sessão:", err);
-        setState((prev) => ({ ...prev, isReady: true }));
+        // EM CASO DE ERRO DE REDE, LIBERAMOS A UI TAMBÉM
+        setState({ user: null, isReady: true });
       });
-  }, [sessionPath, ssoUrl, apiKey]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [sessionPath]);
 
   return (
     <EgSessionContext.Provider value={state}>
@@ -125,6 +133,6 @@ function mapClaims(claims: Record<string, unknown>): EgSessionUser {
     companyName: (claims.company_name as string) ?? null,
     rankName: (claims.rank_name as string) ?? null,
     planSlug: (claims.plan_slug as string) ?? null,
-    provider: (claims.provider as string) ?? undefined, // <-- Injetando o provider pro comparativo OAuth
+    provider: (claims.provider as string) ?? undefined,
   };
 }
