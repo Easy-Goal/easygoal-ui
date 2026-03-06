@@ -104,6 +104,8 @@ function HeaderUserMenu({ config, notifications }: {
   );
 }
 // --- Componente Principal EasyHeader ---
+// packages/ui/src/components/Header/EasyHeader.tsx
+
 export function EasyHeader({
   logoSuffix,
   logoVariant = "dark",
@@ -123,30 +125,39 @@ export function EasyHeader({
   }, []);
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${scrolled ? "bg-[#0d1117]/95 backdrop-blur-md border-b border-white/5" : "bg-transparent"} ${className}`}>
-      <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-6">
-        <a href="/" className="flex items-center gap-1.5 no-underline shrink-0">
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${scrolled ? "bg-[#0d1117]/95 backdrop-blur-md border-b border-white/5" : "bg-transparent"
+      } ${className}`}>
+
+      {/* 1. CONTAINER COM PADDING COERENTE (px-6 ou px-8) */}
+      <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-6 lg:px-8">
+
+        {/* 2. LOGO COM ÁREA DE CLIQUE E RESPIRO */}
+        <a href="/" className="flex items-center gap-3 no-underline shrink-0 mr-4">
           <Logo variant={logoVariant} width={108} />
-          {/* Lógica de sufixo opcional - só renderiza se existir */}
           {logoSuffix && (
-            <div className="flex items-center gap-1 font-mono text-sm">
-              <span className="text-lg opacity-20">/</span>
+            <div className="flex items-center gap-2 font-mono text-sm border-l border-white/10 pl-3">
               <span className="opacity-40">{logoSuffix}</span>
             </div>
           )}
         </a>
 
-        {/* Navegação centralizada com espaçamento corrigido (gap-8) */}
-        <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map(({ label, href }) => (
-            <a key={href} href={href} className="text-sm text-white/55 no-underline transition-colors hover:text-white">
-              {label}
-            </a>
-          ))}
-        </nav>
+        {/* 3. NAVEGAÇÃO COM FLEX E GAP REAL (gap-8 ou gap-10) */}
+        {navLinks.length > 0 && (
+          <nav className="hidden md:flex items-center justify-center gap-10 flex-1 px-4">
+            {navLinks.map(({ label, href }) => (
+              <a
+                key={href}
+                href={href}
+                className="text-sm font-medium text-white/55 no-underline transition-all hover:text-white hover:scale-105"
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+        )}
 
-        <div className="flex items-center gap-3 shrink-0">
-          {/* Lógica: Se logado, mostra Perfil + Sino. Se deslogado, mostra CTAs ativos via Slot */}
+        {/* 4. LADO DIREITO (PERFIL / CTAS) */}
+        <div className="flex items-center gap-4 shrink-0 ml-4">
           {user ? (
             <HeaderUserMenu config={config} notifications={notifications} />
           ) : (

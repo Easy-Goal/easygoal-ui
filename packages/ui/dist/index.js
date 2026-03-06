@@ -411,16 +411,21 @@ function EasyHeader({
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-  return /* @__PURE__ */ jsxRuntime.jsx("header", { className: `fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${scrolled ? "bg-[#0d1117]/95 backdrop-blur-md border-b border-white/5" : "bg-transparent"} ${className}`, children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "mx-auto flex h-16 max-w-[1280px] items-center justify-between px-6", children: [
-    /* @__PURE__ */ jsxRuntime.jsxs("a", { href: "/", className: "flex items-center gap-1.5 no-underline shrink-0", children: [
+  return /* @__PURE__ */ jsxRuntime.jsx("header", { className: `fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${scrolled ? "bg-[#0d1117]/95 backdrop-blur-md border-b border-white/5" : "bg-transparent"} ${className}`, children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "mx-auto flex h-16 max-w-[1280px] items-center justify-between px-6 lg:px-8", children: [
+    /* @__PURE__ */ jsxRuntime.jsxs("a", { href: "/", className: "flex items-center gap-3 no-underline shrink-0 mr-4", children: [
       /* @__PURE__ */ jsxRuntime.jsx(Logo, { variant: logoVariant, width: 108 }),
-      logoSuffix && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-1 font-mono text-sm", children: [
-        /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-lg opacity-20", children: "/" }),
-        /* @__PURE__ */ jsxRuntime.jsx("span", { className: "opacity-40", children: logoSuffix })
-      ] })
+      logoSuffix && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex items-center gap-2 font-mono text-sm border-l border-white/10 pl-3", children: /* @__PURE__ */ jsxRuntime.jsx("span", { className: "opacity-40", children: logoSuffix }) })
     ] }),
-    /* @__PURE__ */ jsxRuntime.jsx("nav", { className: "hidden items-center gap-8 md:flex", children: navLinks.map(({ label, href }) => /* @__PURE__ */ jsxRuntime.jsx("a", { href, className: "text-sm text-white/55 no-underline transition-colors hover:text-white", children: label }, href)) }),
-    /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex items-center gap-3 shrink-0", children: user ? /* @__PURE__ */ jsxRuntime.jsx(HeaderUserMenu, { config, notifications }) : isReady && ctaSlot })
+    navLinks.length > 0 && /* @__PURE__ */ jsxRuntime.jsx("nav", { className: "hidden md:flex items-center justify-center gap-10 flex-1 px-4", children: navLinks.map(({ label, href }) => /* @__PURE__ */ jsxRuntime.jsx(
+      "a",
+      {
+        href,
+        className: "text-sm font-medium text-white/55 no-underline transition-all hover:text-white hover:scale-105",
+        children: label
+      },
+      href
+    )) }),
+    /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex items-center gap-4 shrink-0 ml-4", children: user ? /* @__PURE__ */ jsxRuntime.jsx(HeaderUserMenu, { config, notifications }) : isReady && ctaSlot })
   ] }) });
 }
 var RANK_CONFIG = {
