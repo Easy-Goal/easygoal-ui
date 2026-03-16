@@ -101,7 +101,13 @@ function useSSOLogin(config) {
   const login = (0, import_react2.useCallback)(() => {
     const url = new URL(`${config.ssoUrl}/auth/login`);
     if (config.apiKey) url.searchParams.set("api_key", config.apiKey);
-    url.searchParams.set("redirect_to", window.location.href);
+    if (config.callbackPath) {
+      const callbackUrl = new URL(config.callbackPath, window.location.origin);
+      callbackUrl.searchParams.set("next", window.location.pathname || "/");
+      url.searchParams.set("redirect_to", callbackUrl.toString());
+    } else {
+      url.searchParams.set("redirect_to", window.location.href);
+    }
     window.location.href = url.toString();
   }, [config]);
   const logout = (0, import_react2.useCallback)(async () => {
